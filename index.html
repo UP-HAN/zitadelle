@@ -866,27 +866,38 @@ $('cheer').onclick=e=>{if(e.target===$('cheer'))$('cheer').classList.remove('on'
 /* ── 체험용 예시 기록 ──
    demo:true 표시가 붙은 기록은 이 기기에만 남고 서버로는 절대 보내지 않습니다.
    덕분에 체험하는 분들끼리도, 실제 기록과도 섞이지 않습니다. */
-const DEMO_TOPICS=['6학년 미디어 수업 자료 만들기','학급 문집 편집','학년 협의회 준비',
-  '수학 평가 문항 검토','오늘 수업 성찰 기록','원격 연수 이수','학부모 상담 준비',
-  '과학 실험 준비물 챙기기','온작품읽기 발문 짜기','아이들 일기 답글 쓰기'];
+const DEMO_TOPICS=['해커스 일본어 첫걸음 공부','해커스 여행 일본어 10분의 기적',
+  '영어 기본동사 / 구동사 공부','영어 기본회화 공부','미디어리터러시 전공 공부',
+  'AI리터러시 전공 공부','클로드코드를 활용한 코드 짜기','AI 에이전트 활용 방안 공부',
+  '학교 부장 업무 정리'];
 function hasDemo(){return data.sessions.some(s=>s.demo);}
 function seedDemo(){
   const g=(data.settings.goalMin||30)*60;
   const DAYS=150, STREAK=103;   /* 최근 103일은 매일 목표 달성, 그 앞은 띄엄띄엄 */
+  const WD_A=4*3600+40*60;      /* 평일은 새벽 04:40 ~ 06:40 사이에만 */
+  const WD_B=6*3600+40*60;
+  const N=DEMO_TOPICS.length;
   const out=[];
   for(let d=0;d<DAYS;d++){
     const base=new Date();base.setHours(0,0,0,0);base.setDate(base.getDate()-d);
     if(d===STREAK)continue;                     /* 연속을 끊는 날 */
     const inStreak=d<STREAK;
     if(!inStreak&&(d%3===1))continue;           /* 예전에는 빠진 날들이 있었던 것처럼 */
+    const dow=base.getDay();                    /* 0=일요일 6=토요일 */
+    const weekend=(dow===0||dow===6);
     const total=inStreak?g+((d*7)%5)*300:Math.round(g*0.55);
+    /* 시작 시각 — 평일은 새벽 창 안에서, 주말은 낮부터 저녁 사이 아무 때나 */
+    let at=weekend ? (9*3600+((d*37)%12)*3600+((d*13)%50)*60)
+                   : (WD_A+((d*7)%16)*60);
     let left=total, slot=0;
     while(left>=600&&slot<3){
-      const sec=(slot===2||left<2400)?left:Math.min(left,1500+((d*11)%4)*300);
-      const start=base.getTime()+(9+slot*3)*3600000+((d*13)%50)*60000;
-      out.push({id:start,topic:DEMO_TOPICS[(d+slot)%DEMO_TOPICS.length],
+      let sec=(slot===2||left<2400)?left:Math.min(left,1500+((d*11)%4)*300);
+      if(!weekend&&at+sec>WD_B){sec=WD_B-at;if(sec<600)break;}   /* 06:40 을 넘기지 않음 */
+      const start=base.getTime()+at*1000;
+      out.push({id:start,topic:DEMO_TOPICS[(d*4+slot*5)%N],
         start:start,end:start+sec*1000,sec:sec,demo:true});
-      left-=sec;slot++;
+      left-=sec;at+=sec+300;slot++;             /* 5분 쉬었다가 다음 */
+      if(!weekend&&at>=WD_B-600)break;
     }
   }
   data.sessions=data.sessions.concat(out).sort((a,b)=>a.start-b.start);

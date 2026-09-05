@@ -275,6 +275,21 @@
   .streak-box.risk .streak-n b{color:var(--warn)}
   .streak-msg{font-size:13.5px;color:var(--muted);margin-top:1px}
 
+  /* ── 이어서 해낸 기록 ── */
+  .srow{display:flex;align-items:center;gap:13px;padding:12px 4px;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+  .srow:last-of-type{border-bottom:0}
+  .rk{flex:0 0 auto;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;background:var(--track);color:var(--muted)}
+  .rk.r1{background:linear-gradient(135deg,var(--arc1),var(--arc2));color:#fff}
+  .rk.r2{background:var(--line);color:var(--text)}
+  .srow .sn{font-size:17px;font-weight:800;letter-spacing:-.02em;min-width:62px}
+  .srow .sn b{font-size:23px;color:var(--green-dim)}
+  [data-theme="dark"] .srow .sn b{color:var(--green)}
+  .srow .sd{color:var(--muted);font-size:14px;flex:1;min-width:150px}
+  .now-tag{font-size:12px;font-weight:800;color:var(--arc2);border:1px solid var(--arc2);
+    border-radius:99px;padding:2px 9px}
+  .srow.now .rk.r1{box-shadow:0 0 0 3px var(--halo)}
+
   /* ── 마일스톤 축하 ── */
   .cheer{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
     background:rgba(10,17,34,.58);padding:24px}
@@ -436,6 +451,8 @@
       <div class="stat"><span>목표를 채운 날</span><b id="s-days">0일</b></div>
       <div class="stat"><span>모두 더한 시간</span><b id="s-total">0분</b></div>
     </div>
+    <h2 class="sec"><i></i>이어서 해낸 기록</h2>
+    <div class="card" id="streaks"></div>
     <h2 class="sec"><i></i>최근 14일</h2>
     <div class="card">
       <div class="graph" id="graph"></div>
@@ -804,6 +821,60 @@ async function removeSession(id){
   markDeleted(id);
   await save();renderGoal();renderDots();toast('기록을 지웠습니다.');
 }
+/* ── 지나간 연속 기록 모으기 ──
+   연속이 끊겨도 그때까지 이어온 것은 남습니다. */
+function briefDate(k){
+  const [y,m,d]=k.split('-').map(Number);
+  return (y===new Date().getFullYear()?'':y+'년 ')+m+'월 '+d+'일';
+}
+function nextDayKey(k){
+  const [y,m,d]=k.split('-').map(Number);
+  const dt=new Date(y,m-1,d);dt.setDate(dt.getDate()+1);
+  return dayKey(dt.getTime());
+}
+function allStreaks(){
+  const g=data.settings.goalMin*60, t=totalsByDay();
+  const keys=Object.keys(t).filter(k=>t[k]>=g).sort();
+  const out=[];let cur=null;
+  for(const k of keys){
+    if(cur&&nextDayKey(cur.end)===k){cur.end=k;cur.n++;}
+    else{if(cur)out.push(cur);cur={start:k,end:k,n:1};}
+  }
+  if(cur)out.push(cur);
+  return out;
+}
+/* 지금 이어지고 있는 연속의 마지막 날 (없으면 null) */
+function liveStreakEnd(){
+  const g=data.settings.goalMin*60, t=totalsByDay();
+  const today=dayKey(Date.now());
+  if((t[today]||0)>=g)return today;
+  const y=dayKey(Date.now()-864e5);
+  return (t[y]||0)>=g?y:null;
+}
+function renderStreaks(){
+  const box=$('streaks');if(!box)return;
+  const list=allStreaks().filter(s=>s.n>=2);
+  if(!list.length){
+    box.innerHTML='<div class="empty"><b>아직 이어간 기록이 없습니다.</b>목표를 채운 날이 이틀만 이어져도 여기에 남습니다.</div>';
+    return;
+  }
+  const live=liveStreakEnd();
+  const best=list.slice().sort((a,b)=>b.n-a.n||(a.end<b.end?1:-1)).slice(0,3);
+  const w=list.filter(s=>s.n>=7).length, mo=list.filter(s=>s.n>=30).length;
+  let note;
+  if(mo)note='한 달 넘게 이어간 것이 '+mo+'번, 일주일 넘게 이어간 것이 '+w+'번 있었습니다.';
+  else if(w)note='일주일 넘게 이어간 것이 '+w+'번 있었습니다.';
+  else note='일주일을 이어가면 여기에 함께 남습니다.';
+  box.innerHTML=best.map((s,i)=>{
+    const on=(s.end===live);
+    return '<div class="srow'+(on?' now':'')+'">'
+      +'<span class="rk r'+(i+1)+'">'+(i+1)+'</span>'
+      +'<span class="sn"><b>'+s.n+'</b>일</span>'
+      +'<span class="sd">'+briefDate(s.start)+' ~ '+briefDate(s.end)+'</span>'
+      +(on?'<span class="now-tag">진행 중</span>':'')+'</div>';
+  }).join('')+'<div class="note">'+note+'</div>';
+}
+
 /* ── 연속 기록 응원 ── */
 const MILESTONES=[3,7,14,30,50,100,150,200,250,300,365,500,730,1000];
 function milestoneText(n){
@@ -871,6 +942,7 @@ const DEMO_TOPICS=['해커스 일본어 첫걸음 공부','해커스 여행 일�
   'AI리터러시 전공 공부','클로드코드를 활용한 코드 짜기','AI 에이전트 활용 방안 공부',
   '학교 부장 업무 정리'];
 function hasDemo(){return data.sessions.some(s=>s.demo);}
+const PAST='OOO.O-OOOOOOOOOOOO..OO-O.OOOOOOOO.O-OO..OOO.O-OO';
 function seedDemo(){
   const g=(data.settings.goalMin||30)*60;
   const DAYS=150, STREAK=33;    /* 최근 33일은 매일 목표 달성, 그 앞은 들쭉날쭉 */
@@ -882,15 +954,16 @@ function seedDemo(){
     const base=new Date();base.setHours(0,0,0,0);base.setDate(base.getDate()-d);
     if(d===STREAK)continue;                     /* 연속을 끊는 날 */
     const inStreak=d<STREAK;
-    /* 예전 기록은 실제처럼 들쭉날쭉하게:
-       아예 못한 날, 목표를 못 채운 날, 채운 날이 섞이게 한다 */
+    /* 예전 기록의 모양을 직접 그려 둔다.
+       O 목표를 채운 날, - 하다 만 날, . 아예 못한 날.
+       중간에 12일과 8일쯤 이어간 구간이 있어 지난 기록이 남는다. */
     let total;
     if(inStreak){
       total=g+((d*7)%5)*300;
     }else{
-      if(d%7===2||d%11===5)continue;            /* 아예 못한 날 */
-      total=(d%5===3)?Math.round(g*0.55)         /* 하다 만 날 */
-                     :g+((d*7)%4)*300;           /* 목표를 채운 날 */
+      const c=PAST[(d-STREAK-1)%PAST.length];
+      if(c==='.')continue;
+      total=(c==='-')?Math.round(g*0.55):g+((d*7)%4)*300;
     }
     const dow=base.getDay();                    /* 0=일요일 6=토요일 */
     const weekend=(dow===0||dow===6);
@@ -1069,6 +1142,7 @@ function renderStat(){
   $('s-streak').textContent=streakDays()+'일';
   $('s-days').textContent=Object.values(t).filter(v=>v>=g).length+'일';
   $('s-total').textContent=human(data.sessions.reduce((n,s)=>n+s.sec,0));
+  renderStreaks();
   const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d);}
   const max=Math.max(g,...days.map(d=>t[dayKey(d.getTime())]||0));
   $('graph').innerHTML=days.map(d=>{const v=t[dayKey(d.getTime())]||0;

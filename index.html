@@ -873,7 +873,7 @@ const DEMO_TOPICS=['해커스 일본어 첫걸음 공부','해커스 여행 일�
 function hasDemo(){return data.sessions.some(s=>s.demo);}
 function seedDemo(){
   const g=(data.settings.goalMin||30)*60;
-  const DAYS=150, STREAK=103;   /* 최근 103일은 매일 목표 달성, 그 앞은 띄엄띄엄 */
+  const DAYS=150, STREAK=33;    /* 최근 33일은 매일 목표 달성, 그 앞은 들쭉날쭉 */
   const WD_A=4*3600+40*60;      /* 평일은 새벽 04:40 ~ 06:40 사이에만 */
   const WD_B=6*3600+40*60;
   const N=DEMO_TOPICS.length;
@@ -882,10 +882,18 @@ function seedDemo(){
     const base=new Date();base.setHours(0,0,0,0);base.setDate(base.getDate()-d);
     if(d===STREAK)continue;                     /* 연속을 끊는 날 */
     const inStreak=d<STREAK;
-    if(!inStreak&&(d%3===1))continue;           /* 예전에는 빠진 날들이 있었던 것처럼 */
+    /* 예전 기록은 실제처럼 들쭉날쭉하게:
+       아예 못한 날, 목표를 못 채운 날, 채운 날이 섞이게 한다 */
+    let total;
+    if(inStreak){
+      total=g+((d*7)%5)*300;
+    }else{
+      if(d%7===2||d%11===5)continue;            /* 아예 못한 날 */
+      total=(d%5===3)?Math.round(g*0.55)         /* 하다 만 날 */
+                     :g+((d*7)%4)*300;           /* 목표를 채운 날 */
+    }
     const dow=base.getDay();                    /* 0=일요일 6=토요일 */
     const weekend=(dow===0||dow===6);
-    const total=inStreak?g+((d*7)%5)*300:Math.round(g*0.55);
     /* 시작 시각 — 평일은 새벽 창 안에서, 주말은 낮부터 저녁 사이 아무 때나 */
     let at=weekend ? (9*3600+((d*37)%12)*3600+((d*13)%50)*60)
                    : (WD_A+((d*7)%16)*60);

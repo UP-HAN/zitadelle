@@ -278,17 +278,20 @@
   /* ── 이어서 해낸 기록 ── */
   .srow{display:flex;align-items:center;gap:13px;padding:12px 4px;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
   .srow:last-of-type{border-bottom:0}
-  .rk{flex:0 0 auto;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;
-    font-size:13px;font-weight:800;background:var(--track);color:var(--muted)}
-  .rk.r1{background:linear-gradient(135deg,var(--arc1),var(--arc2));color:#fff}
-  .rk.r2{background:var(--line);color:var(--text)}
+  .rk{flex:0 0 auto;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+    font-size:23px;line-height:1;border-radius:50%}
   .srow .sn{font-size:17px;font-weight:800;letter-spacing:-.02em;min-width:62px}
   .srow .sn b{font-size:23px;color:var(--green-dim)}
   [data-theme="dark"] .srow .sn b{color:var(--green)}
   .srow .sd{color:var(--muted);font-size:14px;flex:1;min-width:150px}
   .now-tag{font-size:12px;font-weight:800;color:var(--arc2);border:1px solid var(--arc2);
     border-radius:99px;padding:2px 9px}
-  .srow.now .rk.r1{box-shadow:0 0 0 3px var(--halo)}
+  .srow.now .rk{box-shadow:0 0 0 4px var(--halo)}
+
+  /* 메뉴와 빈 화면의 이모지 */
+  .ne{margin-right:6px;font-size:14px}
+  @media (max-width:640px){.ne{display:none}}
+  .ebig{font-size:36px;line-height:1;margin-bottom:10px}
 
   /* ── 마일스톤 축하 ── */
   .cheer{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
@@ -301,6 +304,7 @@
   .cheer-ico{font-size:54px;line-height:1}
   .cheer-n{font-size:36px;font-weight:800;color:var(--green);letter-spacing:-.03em;margin-top:6px}
   .cheer-t{font-size:18px;font-weight:800;margin-top:4px}
+  .cheer-conf{font-size:17px;letter-spacing:.35em;margin-top:9px;opacity:.9}
   .cheer-s{font-size:14.5px;color:var(--muted);margin-top:11px;line-height:1.6}
   .cheer .btnrow{justify-content:center}
 
@@ -350,11 +354,11 @@
   <div class="top-in">
     <div class="brand"><i></i>옆 반 선생님의 치타델레(Zitadelle)</div>
     <nav>
-      <button data-view="timer" aria-current="page">타이머</button>
-      <button data-view="log">기록</button>
-      <button data-view="stat">통계</button>
-      <button data-view="set">설정</button>
-      <button id="nav-demo" class="nav-demo" title="예시 기록으로 미리 보기">체험</button>
+      <button data-view="timer" aria-current="page"><span class="ne">⏱️</span>타이머</button>
+      <button data-view="log"><span class="ne">📝</span>기록</button>
+      <button data-view="stat"><span class="ne">📊</span>통계</button>
+      <button data-view="set"><span class="ne">⚙️</span>설정</button>
+      <button id="nav-demo" class="nav-demo" title="예시 기록으로 미리 보기"><span class="ne">✨</span>체험</button>
     </nav>
     <button class="theme-btn" id="theme-btn" title="밝게/어둡게 바꾸기" aria-label="밝게/어둡게 바꾸기">
       <svg id="theme-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></svg>
@@ -364,7 +368,7 @@
 
 <div class="shell">
   <section id="v-timer">
-    <div class="pill"><span class="dot"></span><span id="pill-txt">하루 30분</span></div>
+    <div class="pill"><span class="dot"></span><span id="pill-txt">🎯 하루 30분</span></div>
     <h1 class="hero">치타델레(Zitadelle)</h1>
     <p class="hero-sub">치타델레는 독일어로 성채나 요새 안의 작은 보루, 내성을 의미합니다.</p>
 
@@ -447,18 +451,18 @@
     <h1 class="hero" style="font-size:clamp(28px,5vw,40px)">돌아보기</h1>
     <p class="hero-sub">2주 동안의 흐름과, 시간을 가장 많이 쓴 주제입니다.</p>
     <div class="stats">
-      <div class="stat"><span>연속 달성</span><b id="s-streak">0일</b></div>
-      <div class="stat"><span>목표를 채운 날</span><b id="s-days">0일</b></div>
-      <div class="stat"><span>모두 더한 시간</span><b id="s-total">0분</b></div>
+      <div class="stat"><span>🔥 연속 달성</span><b id="s-streak">0일</b></div>
+      <div class="stat"><span>✅ 목표를 채운 날</span><b id="s-days">0일</b></div>
+      <div class="stat"><span>⏳ 모두 더한 시간</span><b id="s-total">0분</b></div>
     </div>
-    <h2 class="sec"><i></i>이어서 해낸 기록</h2>
+    <h2 class="sec"><i></i>🏅 이어서 해낸 기록</h2>
     <div class="card" id="streaks"></div>
-    <h2 class="sec"><i></i>최근 14일</h2>
+    <h2 class="sec"><i></i>📊 최근 14일</h2>
     <div class="card">
       <div class="graph" id="graph"></div>
       <div class="note">초록색 막대는 목표를 채운 날입니다.</div>
     </div>
-    <h2 class="sec"><i></i>주제별 누적</h2>
+    <h2 class="sec"><i></i>📚 주제별 누적</h2>
     <div class="card" id="topics"></div>
   </section>
 
@@ -486,36 +490,36 @@
       </div>
       <div class="note">휴식 길이를 0으로 두면 휴식 없이 집중만 반복합니다. 집중하는 동안에는 태블릿 화면이 꺼지지 않도록 잡아 둡니다.</div>
     </div>
-    <h2 class="sec"><i></i>체험용 예시 기록</h2>
+    <h2 class="sec"><i></i>🎁 체험용 예시 기록</h2>
     <div class="card">
       <p class="note" style="margin-top:0">약 100일치 예시 기록을 채워 연속 기록과 통계가 어떻게 보이는지 미리 확인할 수 있습니다. 예시 기록은 <b>이 기기에만</b> 저장되고 서버로는 전송되지 않아, 실제 기록과 섞이지 않습니다.</p>
       <div class="btnrow">
-        <button class="ghost" id="btn-demo-on2">예시 기록 채우기</button>
-        <button class="ghost" id="btn-demo-off2">예시 기록만 지우기</button>
+        <button class="ghost" id="btn-demo-on2">🎁 예시 기록 채우기</button>
+        <button class="ghost" id="btn-demo-off2">🧹 예시 기록만 지우기</button>
       </div>
     </div>
-    <h2 class="sec"><i></i>기기 간 동기화</h2>
+    <h2 class="sec"><i></i>🔄 기기 간 동기화</h2>
     <div class="card">
       <p class="note" style="margin-top:0">암호를 넣으면 PC·태블릿·휴대폰이 같은 기록을 봅니다. 기기마다 한 번만 넣으면 됩니다. 암호는 이 기기에만 저장됩니다.</p>
       <label class="f" for="sync-key">동기화 암호</label>
       <input type="password" id="sync-key" placeholder="서버에 정해 둔 암호" autocomplete="off">
       <div class="btnrow">
-        <button class="ghost" id="btn-sync-save">저장하고 맞추기</button>
+        <button class="ghost" id="btn-sync-save">🔄 저장하고 맞추기</button>
         <button class="ghost" id="btn-sync-now">지금 맞추기</button>
         <button class="ghost" id="btn-sync-off">이 기기에서 끄기</button>
       </div>
       <div class="note" id="sync-note">아직 설정하지 않았습니다. 이 기기에만 기록이 쌓입니다.</div>
     </div>
-    <h2 class="sec"><i></i>기록 내보내기</h2>
+    <h2 class="sec"><i></i>📤 기록 내보내기</h2>
     <div class="card">
       <p class="note" style="margin-top:0">아래 내용을 복사해 스프레드시트에 붙여 넣으면 표가 됩니다.</p>
       <textarea id="csv" rows="7" readonly></textarea>
       <div class="btnrow"><button class="ghost" id="btn-refresh-csv">지금 기록으로 다시 만들기</button></div>
     </div>
-    <h2 class="sec"><i></i>기록 지우기</h2>
+    <h2 class="sec"><i></i>🗑️ 기록 지우기</h2>
     <div class="card">
       <p class="note" style="margin-top:0">모든 집중 기록이 사라지고 되돌릴 수 없습니다.</p>
-      <div class="btnrow"><button class="ghost" id="btn-wipe" style="border-color:#e0b4b4;color:#c0392b">전체 기록 지우기</button></div>
+      <div class="btnrow"><button class="ghost" id="btn-wipe" style="border-color:#e0b4b4;color:#c0392b">🗑️ 전체 기록 지우기</button></div>
     </div>
   </section>
 </div>
@@ -524,8 +528,9 @@
     <div class="cheer-ico" id="cheer-ico">🔥</div>
     <div class="cheer-n" id="cheer-n">7일</div>
     <div class="cheer-t" id="cheer-t">연속 달성</div>
+    <div class="cheer-conf">🎊 ✨ 🎊</div>
     <div class="cheer-s" id="cheer-s"></div>
-    <div class="btnrow"><button class="primary" id="cheer-ok">고맙습니다</button></div>
+    <div class="btnrow"><button class="primary" id="cheer-ok">🙌 계속 가볼게요</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -769,7 +774,7 @@ function renderTimer(){
     $('btn-stop').hidden=true;$('btn-cancel').hidden=true;
     $('clock').classList.remove('paused');$('topic').disabled=false;
     $('mode-tag').textContent='집중';$('mode-tag').classList.remove('brk');
-    $('dial-note').textContent='시작을 누르면 시각이 기록됩니다';
+    $('dial-note').textContent='⏱️ 시작을 누르면 시각이 기록됩니다';
     paint(0,pickMin*60,'focus');
   }else if(a.mode==='focus'){
     m.textContent=a.running?'잠시 멈춤':'이어서 집중';m.classList.remove('brk');
@@ -777,7 +782,7 @@ function renderTimer(){
     $('btn-cancel').hidden=false;$('btn-cancel').textContent='버리기';
     $('clock').classList.toggle('paused',!a.running);$('topic').disabled=true;
     $('mode-tag').textContent='집중';$('mode-tag').classList.remove('brk');
-    $('dial-note').textContent=hhmm(a.start)+' 시작 · '+a.topic;
+    $('dial-note').textContent='📌 '+hhmm(a.start)+' 시작 · '+a.topic;
     paint(elapsed(),a.target,'focus');
   }else{
     m.textContent=a.running?'잠시 멈춤':'이어서 쉬기';m.classList.add('brk');
@@ -785,7 +790,7 @@ function renderTimer(){
     $('btn-cancel').hidden=false;$('btn-cancel').textContent='휴식 건너뛰기';
     $('clock').classList.toggle('paused',!a.running);$('topic').disabled=true;
     $('mode-tag').textContent='휴식';$('mode-tag').classList.add('brk');
-    $('dial-note').textContent='잠깐 쉬었다가 이어서 하세요';
+    $('dial-note').textContent='☕ 잠깐 쉬었다가 이어서 하세요';
     paint(elapsed(),a.target,'break');
   }
   renderDots();renderGoal();
@@ -800,8 +805,8 @@ function renderGoal(){
   $('over-bar').style.width=Math.min(100,over/g*100)+'%';
   $('streak-txt').textContent=(cnt?cnt+'회 · ':'')+(n?'연속 '+n+'일째':'');
   renderStreak(n,t>=g);
-  $('pill-txt').textContent='하루 '+data.settings.goalMin+'분';
-  if(t>=g)$('today-note').innerHTML='<span class="done-tag">오늘 목표를 채웠습니다.</span> 더 하고 싶으면 계속 이어서 하세요. 넘긴 만큼 파란 줄로 쌓입니다.';
+  $('pill-txt').textContent='🎯 하루 '+data.settings.goalMin+'분';
+  if(t>=g)$('today-note').innerHTML='<span class="done-tag">🎉 오늘 목표를 채웠습니다.</span> 더 하고 싶으면 계속 이어서 하세요. 넘긴 만큼 파란 줄로 쌓입니다.';
   else if(t>0)$('today-note').textContent=human(g-t)+' 더 하면 오늘 목표를 채웁니다.';
   else $('today-note').textContent='아직 오늘 기록이 없습니다.';
   const k=dayKey(Date.now());
@@ -819,7 +824,7 @@ async function removeSession(id){
   if(!confirm(hhmm(s.start)+'에 시작한 「'+s.topic+'」 '+human(s.sec)+' 기록을 지울까요?'))return;
   data.sessions=data.sessions.filter(x=>String(x.id)!==String(id));
   markDeleted(id);
-  await save();renderGoal();renderDots();toast('기록을 지웠습니다.');
+  await save();renderGoal();renderDots();toast('🗑️ 기록을 지웠습니다.');
 }
 /* ── 지나간 연속 기록 모으기 ──
    연속이 끊겨도 그때까지 이어온 것은 남습니다. */
@@ -855,23 +860,23 @@ function renderStreaks(){
   const box=$('streaks');if(!box)return;
   const list=allStreaks().filter(s=>s.n>=2);
   if(!list.length){
-    box.innerHTML='<div class="empty"><b>아직 이어간 기록이 없습니다.</b>목표를 채운 날이 이틀만 이어져도 여기에 남습니다.</div>';
+    box.innerHTML='<div class="empty"><div class="ebig">🌱</div><b>아직 이어간 기록이 없습니다.</b>목표를 채운 날이 이틀만 이어져도 여기에 남습니다.</div>';
     return;
   }
   const live=liveStreakEnd();
   const best=list.slice().sort((a,b)=>b.n-a.n||(a.end<b.end?1:-1)).slice(0,3);
   const w=list.filter(s=>s.n>=7).length, mo=list.filter(s=>s.n>=30).length;
   let note;
-  if(mo)note='한 달 넘게 이어간 것이 '+mo+'번, 일주일 넘게 이어간 것이 '+w+'번 있었습니다.';
-  else if(w)note='일주일 넘게 이어간 것이 '+w+'번 있었습니다.';
-  else note='일주일을 이어가면 여기에 함께 남습니다.';
+  if(mo)note='🏅 한 달 넘게 이어간 것이 '+mo+'번, 일주일 넘게 이어간 것이 '+w+'번 있었습니다.';
+  else if(w)note='🏅 일주일 넘게 이어간 것이 '+w+'번 있었습니다.';
+  else note='🌱 일주일을 이어가면 여기에 함께 남습니다.';
   box.innerHTML=best.map((s,i)=>{
     const on=(s.end===live);
     return '<div class="srow'+(on?' now':'')+'">'
-      +'<span class="rk r'+(i+1)+'">'+(i+1)+'</span>'
+      +'<span class="rk r'+(i+1)+'">'+['🥇','🥈','🥉'][i]+'</span>'
       +'<span class="sn"><b>'+s.n+'</b>일</span>'
       +'<span class="sd">'+briefDate(s.start)+' ~ '+briefDate(s.end)+'</span>'
-      +(on?'<span class="now-tag">진행 중</span>':'')+'</div>';
+      +(on?'<span class="now-tag">🔥 진행 중</span>':'')+'</div>';
   }).join('')+'<div class="note">'+note+'</div>';
 }
 
@@ -905,11 +910,11 @@ function renderStreak(n,doneToday){
   const nx=nextMilestone(n);
   let msg;
   if(!doneToday&&n>0){
-    msg='오늘 목표를 채우면 '+(n+1)+'일째가 됩니다. 아직 늦지 않았습니다.';
+    msg='⏳ 오늘 목표를 채우면 '+(n+1)+'일째가 됩니다. 아직 늦지 않았습니다.';
   }else if(nx){
-    msg=nx+'일까지 '+(nx-n)+'일 남았습니다.';
+    msg='🎯 다음 '+nx+'일까지 '+(nx-n)+'일 남았습니다.';
   }else{
-    msg='기록을 계속 이어가고 계십니다.';
+    msg='🏆 기록을 계속 이어가고 계십니다.';
   }
   $('streak-msg').textContent=msg;
   $('streak-flame').textContent=(!doneToday&&n>0)?'🕯️':'🔥';
@@ -989,14 +994,14 @@ async function startDemo(){
   seedDemo();
   data.celebrated=[];            /* 축하 화면을 다시 볼 수 있게 */
   await save();refreshAll();
-  toast('예시 기록을 채웠습니다. 통계 화면도 함께 보세요.');
+  toast('🎁 예시 기록을 채웠습니다. 통계 화면도 함께 보세요.');
 }
 async function clearDemo(){
   if(!hasDemo()){toast('예시 기록이 없습니다.');return;}
   if(!confirm('예시 기록만 지웁니다. 직접 기록하신 내용은 그대로 남습니다. 계속할까요?'))return;
   data.sessions=data.sessions.filter(s=>!s.demo);
   await save();refreshAll();
-  toast('예시 기록을 지웠습니다.');
+  toast('🧹 예시 기록을 지웠습니다.');
 }
 function renderDemoBar(){
   const b=$('nav-demo');if(!b)return;
@@ -1013,10 +1018,10 @@ function renderSync(){
   const k=sync.key();
   const txt={
     off:k?'맞추는 중입니다.':'아직 설정하지 않았습니다. 이 기기에만 기록이 쌓입니다.',
-    busy:'서버와 맞추는 중입니다.',
-    ok:'맞춰졌습니다. 마지막 '+(sync.at?hhmm(sync.at):'')+'. 기록 '+data.sessions.length+'개.',
-    err:'서버에 연결하지 못했습니다. 기록은 이 기기에 안전하게 남아 있고, 연결되면 자동으로 맞춥니다.',
-    auth:'암호가 맞지 않습니다. 다시 입력해 주세요.'
+    busy:'⏳ 서버와 맞추는 중입니다.',
+    ok:'✅ 맞춰졌습니다. 마지막 '+(sync.at?hhmm(sync.at):'')+'. 기록 '+data.sessions.length+'개.',
+    err:'⚠️ 서버에 연결하지 못했습니다. 기록은 이 기기에 안전하게 남아 있고, 연결되면 자동으로 맞춥니다.',
+    auth:'🔑 암호가 맞지 않습니다. 다시 입력해 주세요.'
   }[sync.state]||'';
   const cls=sync.state==='off'?'':sync.state;
   el.innerHTML='<span class="sync-dot '+cls+'"></span>'+esc(txt);
@@ -1056,15 +1061,15 @@ async function finish(auto){
   stopTick();release();
   if(a.mode==='break'){
     data.active=null;if(auto&&data.settings.sound)beep(1);
-    renderTimer();await save();if(auto)toast('휴식이 끝났습니다. 다시 시작할 준비가 됐어요.');return;
+    renderTimer();await save();if(auto)toast('☕ 휴식이 끝났습니다. 다시 시작할 준비가 됐어요.');return;
   }
   const sec=Math.round(auto?a.target:elapsed());
   data.active=null;
   if(sec>=60){
     const g=data.settings.goalMin*60, before=todaySec();
     data.sessions.push({id:a.start,topic:a.topic,start:a.start,end:a.start+sec*1000,sec:sec});
-    toast(human(sec)+' 기록했습니다.'+((before<g&&todaySec()>=g)?' 오늘 목표 달성!':''));
-  }else toast('1분이 되지 않아 기록하지 않았습니다.');
+    toast('✅ '+human(sec)+' 기록했습니다.'+((before<g&&todaySec()>=g)?' 🎉 오늘 목표 달성!':''));
+  }else toast('⏱️ 1분이 되지 않아 기록하지 않았습니다.');
   if(auto&&data.settings.sound)beep(0);
   $('topic').value=a.topic;
   await save();
@@ -1116,18 +1121,18 @@ function beep(soft){try{ensureAudio();if(!actx)return;
 /* 기록 */
 function renderLog(){
   const box=$('log-body');
-  if(!data.sessions.length){box.innerHTML='<div class="empty"><b>아직 기록이 없습니다.</b>타이머 화면에서 첫 30분을 시작해 보세요.</div>';return;}
+  if(!data.sessions.length){box.innerHTML='<div class="empty"><div class="ebig">📝</div><b>아직 기록이 없습니다.</b>타이머 화면에서 첫 30분을 시작해 보세요.</div>';return;}
   const g=data.settings.goalMin*60,by={};
   data.sessions.forEach(s=>{(by[dayKey(s.start)]=by[dayKey(s.start)]||[]).push(s);});
   box.innerHTML=Object.keys(by).sort().reverse().map(k=>{
     const list=by[k].slice().sort((a,b)=>b.start-a.start);
     const tot=list.reduce((n,s)=>n+s.sec,0);
     return '<div class="day"><div class="day-head"><span class="day-date">'+korDate(k)+'</span>'
-      +(tot>=g?'<span class="done-tag">목표 달성</span>':'')
+      +(tot>=g?'<span class="done-tag">🎉 목표 달성</span>':'')
       +'<span class="day-total">모두 '+human(tot)+' · '+list.length+'회</span></div>'
       +list.map(s=>'<div class="row"><span class="time">'+hhmm(s.start)+' → '+hhmm(s.end)+'</span>'
         +'<span class="topic">'+esc(s.topic)+'</span><span class="len">'+human(s.sec)+'</span>'
-        +'<button class="tiny" data-del="'+s.id+'">지우기</button></div>').join('')+'</div>';
+        +'<button class="tiny" data-del="'+s.id+'">🗑️ 지우기</button></div>').join('')+'</div>';
   }).join('');
   box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
     if(!confirm('이 기록을 지울까요?'))return;
@@ -1153,7 +1158,7 @@ function renderStat(){
   $('topics').innerHTML=rank.length?rank.map(([n,v])=>
     '<div class="topic-line"><span class="nm">'+esc(n)+'</span><span class="tb"><i style="width:'+(v/rank[0][1]*100)+'%"></i></span>'
     +'<span class="vl">'+human(v)+'</span></div>').join('')
-    :'<div class="empty"><b>아직 볼 것이 없습니다.</b>집중을 한 번 기록하면 여기에 쌓입니다.</div>';
+    :'<div class="empty"><div class="ebig">📚</div><b>아직 볼 것이 없습니다.</b>집중을 한 번 기록하면 여기에 쌓입니다.</div>';
 }
 
 /* 설정 */
@@ -1170,7 +1175,7 @@ function renderSettings(){
   renderSync();
 }
 $('goal-min').onchange=async e=>{const v=Math.max(5,Math.min(600,Number(e.target.value)||30));
-  e.target.value=v;data.settings.goalMin=v;await save();renderGoal();toast('하루 목표를 '+v+'분으로 바꿨습니다.');};
+  e.target.value=v;data.settings.goalMin=v;await save();renderGoal();toast('🎯 하루 목표를 '+v+'분으로 바꿨습니다.');};
 $('break-min').onchange=async e=>{const v=Math.max(0,Math.min(60,Number(e.target.value)||0));
   e.target.value=v;data.settings.breakMin=v;await save();};
 $('snd').onchange=async e=>{data.settings.sound=Number(e.target.value);await save();};
@@ -1184,12 +1189,12 @@ $('btn-sync-save').onclick=async()=>{
   if(!v){toast('암호를 입력해 주세요.');return;}
   sync.setKey(v);$('sync-key').value='';
   const ok=await sync.run();refreshAll();
-  toast(ok?'동기화를 켰습니다. 이제 다른 기기에서도 같은 암호를 넣으면 됩니다.':'맞추지 못했습니다. 암호와 연결을 확인해 주세요.');
+  toast(ok?'🔄 동기화를 켰습니다. 이제 다른 기기에서도 같은 암호를 넣으면 됩니다.':'맞추지 못했습니다. 암호와 연결을 확인해 주세요.');
 };
 $('btn-sync-now').onclick=async()=>{
   if(!sync.on()){toast('먼저 암호를 저장해 주세요.');return;}
   const ok=await sync.run();refreshAll();
-  toast(ok?'기록을 맞췄습니다.':'맞추지 못했습니다.');
+  toast(ok?'✅ 기록을 맞췄습니다.':'맞추지 못했습니다.');
 };
 $('btn-sync-off').onclick=()=>{
   if(!confirm('이 기기에서만 동기화를 끕니다. 서버의 기록과 이 기기의 기록은 그대로 남습니다. 계속할까요?'))return;
@@ -1199,7 +1204,7 @@ $('btn-wipe').onclick=async()=>{
   if(!confirm('모든 기록을 지웁니다. 되돌릴 수 없습니다. 계속할까요?'))return;
   data.sessions.forEach(s=>markDeleted(s.id));
   data.sessions=[];data.active=null;await save();
-  renderTimer();renderLog();renderSettings();toast('기록을 모두 지웠습니다.');};
+  renderTimer();renderLog();renderSettings();toast('🗑️ 기록을 모두 지웠습니다.');};
 
 let toastId=null;
 function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('on');

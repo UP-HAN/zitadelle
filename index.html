@@ -21,6 +21,12 @@
     --track:#e6e5de; --shadow:0 1px 2px rgba(30,50,80,.05),0 8px 24px rgba(30,50,80,.05);
     --radius:14px;
     --wrap:1100px;   /* 머리말과 본문이 같은 폭을 쓰도록 한 곳에서 관리 */
+    /* 시계 링 색 */
+    --arc1:#00c983; --arc2:#00b0dc; --arc3:#4d7cff;
+    --brk1:#7c8cff; --brk2:#c08cff;
+    --arc-glow:rgba(0,176,220,.42); --brk-glow:rgba(140,140,255,.42);
+    --halo:rgba(0,201,131,.15); --halo-brk:rgba(140,140,255,.15);
+    --clk1:#0e9e6a; --clk2:#2464c9;
   }
   [data-theme="dark"]{
     --navbg:#0e1830; --navtext:#e6edf7; --navmuted:#8ba0bd;
@@ -33,6 +39,11 @@
     --warn:#ffb46b;
     --btn:#3ee89a; --btn-text:#06231a;
     --track:rgba(148,163,184,.16); --shadow:none;
+    --arc1:#3ee89a; --arc2:#3ad6f0; --arc3:#7aa8ff;
+    --brk1:#9aa6ff; --brk2:#d59dff;
+    --arc-glow:rgba(62,232,154,.5); --brk-glow:rgba(154,166,255,.5);
+    --halo:rgba(62,232,154,.18); --halo-brk:rgba(154,166,255,.18);
+    --clk1:#3ee89a; --clk2:#8ec5ff;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
@@ -98,26 +109,47 @@
   .chip:disabled{opacity:.45;cursor:not-allowed}
 
   /* ── 다이얼 ── */
+  /* ── 시계 ── */
   .dial{position:relative;width:min(330px,74vw);aspect-ratio:1/1;margin:30px auto 10px}
+  /* 돌아가는 동안 은은하게 숨쉬는 후광 */
+  .dial::before{content:'';position:absolute;inset:6%;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle,var(--halo) 0%,transparent 65%);
+    opacity:0;transition:opacity .6s ease}
+  .dial.running::before{opacity:1;animation:breathe 4.5s ease-in-out infinite}
+  .dial.running.brk::before{background:radial-gradient(circle,var(--halo-brk) 0%,transparent 65%)}
+  @keyframes breathe{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.06);opacity:1}}
+
   .dial svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block}
   .rot{transform:rotate(-90deg);transform-origin:150px 150px}
-  .track{fill:none;stroke:var(--track);stroke-width:9}
-  .prog{fill:none;stroke:var(--green);stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset .25s linear}
-  .prog.brk{stroke:var(--blue)}
+  .s1{stop-color:var(--arc1)} .s2{stop-color:var(--arc2)} .s3{stop-color:var(--arc3)}
+  .b1{stop-color:var(--brk1)} .b2{stop-color:var(--brk2)}
+  .track{fill:none;stroke:var(--track);stroke-width:11;opacity:.6}
+  .prog{fill:none;stroke:url(#g-focus);stroke-width:13;stroke-linecap:round;
+    transition:stroke-dashoffset .25s linear;filter:drop-shadow(0 0 7px var(--arc-glow))}
+  .prog.brk{stroke:url(#g-break);filter:drop-shadow(0 0 7px var(--brk-glow))}
   .tick{stroke:var(--track);stroke-width:2}
-  .tick.big{stroke:var(--muted);opacity:.45;stroke-width:3}
-  .tick.on{stroke:var(--green);opacity:1}
-  .tick.on.brk{stroke:var(--blue)}
+  .tick.big{stroke:var(--muted);opacity:.4;stroke-width:3}
+  .tick.on{stroke:var(--arc2);opacity:1}
+  .tick.on.brk{stroke:var(--brk1)}
+
   .dial-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:4px;pointer-events:none;text-align:center;padding:0 18%}
-  .mode-tag{font-size:13px;font-weight:800;color:var(--green-dim)}
-  [data-theme="dark"] .mode-tag{color:var(--green)}
-  .mode-tag.brk{color:var(--blue)}
-  .clock{font-size:clamp(44px,10.5vw,60px);font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+  .mode-tag{font-size:12.5px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+    text-transform:none;padding:3px 11px;border-radius:99px;border:1px solid var(--line);background:var(--panel-2)}
+  .dial.running .mode-tag{color:var(--arc2);border-color:var(--arc2)}
+  .dial.running.brk .mode-tag{color:var(--brk1);border-color:var(--brk1)}
+  .clock{font-size:clamp(46px,11vw,66px);font-weight:900;letter-spacing:-.04em;
+    font-variant-numeric:tabular-nums;line-height:1;color:var(--text)}
+  @supports ((-webkit-background-clip:text) or (background-clip:text)){
+    .clock{background:linear-gradient(135deg,var(--clk1) 0%,var(--clk2) 100%);
+      -webkit-background-clip:text;background-clip:text;
+      color:transparent;-webkit-text-fill-color:transparent}
+    .clock.paused{background:none;color:var(--warn);-webkit-text-fill-color:var(--warn)}
+  }
   .clock.paused{color:var(--warn)}
   .dots{display:flex;gap:7px;margin-top:9px}
   .dots i{width:9px;height:9px;border-radius:50%;background:var(--track);display:block}
-  .dots i.on{background:var(--green)}
+  .dots i.on{background:var(--arc2);box-shadow:0 0 6px var(--arc-glow)}
   .dial-note{text-align:center;color:var(--muted);font-size:14px;min-height:22px;margin-bottom:4px}
 
   .btnrow{display:flex;gap:11px;flex-wrap:wrap;margin-top:20px}
@@ -295,7 +327,7 @@
   .sync-dot.busy{background:var(--warn)}
 
   @media (prefers-reduced-motion:reduce){*{transition:none !important}
-    .streak-box.hot .streak-flame,.cheer-card{animation:none !important}}
+    .streak-box.hot .streak-flame,.cheer-card,.dial.running::before{animation:none !important}}
 </style>
 
 <div class="bgwrap"></div>
@@ -339,8 +371,16 @@
       <button class="full-btn" id="btn-full" title="전체화면으로 보기" aria-label="전체화면으로 보기">
         <svg id="full-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
       </button>
-      <div class="dial">
+      <div class="dial" id="dial">
         <svg viewBox="0 0 300 300" aria-hidden="true">
+          <defs>
+            <linearGradient id="g-focus" x1="20" y1="280" x2="280" y2="20" gradientUnits="userSpaceOnUse">
+              <stop class="s1" offset="0"></stop><stop class="s2" offset=".55"></stop><stop class="s3" offset="1"></stop>
+            </linearGradient>
+            <linearGradient id="g-break" x1="20" y1="280" x2="280" y2="20" gradientUnits="userSpaceOnUse">
+              <stop class="b1" offset="0"></stop><stop class="b2" offset="1"></stop>
+            </linearGradient>
+          </defs>
           <g id="ticks"></g>
           <g class="rot">
             <circle class="track" cx="150" cy="150" r="120"></circle>
@@ -703,6 +743,9 @@ function renderDots(){
 function renderTimer(){
   renderDemoBar();
   const a=data.active, m=$('btn-main');
+  /* 시계 후광과 강조색: 돌아가는 중인지, 휴식인지에 따라 */
+  $('dial').classList.toggle('running',!!(a&&a.running));
+  $('dial').classList.toggle('brk',!!(a&&a.mode==='break'));
   document.querySelectorAll('#durs .chip').forEach(c=>c.disabled=!!a);
   if(!a){
     m.textContent='집중 시작';m.classList.remove('brk');

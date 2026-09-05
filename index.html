@@ -20,6 +20,7 @@
     --btn:#1e3252; --btn-text:#ffffff;
     --track:#e6e5de; --shadow:0 1px 2px rgba(30,50,80,.05),0 8px 24px rgba(30,50,80,.05);
     --radius:14px;
+    --wrap:1100px;   /* 머리말과 본문이 같은 폭을 쓰도록 한 곳에서 관리 */
   }
   [data-theme="dark"]{
     --navbg:#0e1830; --navtext:#e6edf7; --navmuted:#8ba0bd;
@@ -52,7 +53,7 @@
   header.top{position:relative;z-index:2;background:var(--navbg)}
   header.top::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;
     background:linear-gradient(90deg,var(--green),var(--blue-soft))}
-  .top-in{max-width:1040px;margin:0 auto;padding:16px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .top-in{max-width:var(--wrap);margin:0 auto;padding:14px 30px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
   .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:18px;white-space:nowrap;letter-spacing:-.02em;color:var(--navtext)}
   .brand i{display:block;width:4px;height:19px;border-radius:2px;background:var(--green)}
   nav{display:flex;gap:4px;margin-left:auto}
@@ -64,7 +65,7 @@
   .theme-btn{border:0;background:transparent;color:var(--navmuted);cursor:pointer;padding:8px;border-radius:9px;line-height:0}
   .theme-btn:hover{color:var(--navtext);background:rgba(255,255,255,.08)}
 
-  .shell{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:40px 22px 80px}
+  .shell{position:relative;z-index:1;max-width:var(--wrap);margin:0 auto;padding:26px 30px 48px}
 
   h1.hero{margin:0 0 12px;word-break:keep-all;overflow-wrap:anywhere;font-size:clamp(32px,6vw,50px);font-weight:900;letter-spacing:-.035em;line-height:1.12;
     background:linear-gradient(96deg,var(--green) 0%,var(--green) 30%,var(--blue) 92%);
@@ -195,14 +196,19 @@
   .tgrid .card{margin-top:0}
   .a-dial{display:flex;flex-direction:column;justify-content:center}
   @media (min-width:840px){
-    .shell{max-width:1140px;padding-top:34px}
-    .tgrid{grid-template-columns:1.02fr .98fr;
+    :root{--wrap:1400px}
+    .shell{padding-top:24px}
+    .tgrid{grid-template-columns:1.02fr .98fr;gap:22px;
            grid-template-areas:"dial setup" "dial goal";align-items:start}
     .a-dial{grid-area:dial}
     .a-setup{grid-area:setup}
     .a-goal{grid-area:goal}
     h1.hero{font-size:clamp(36px,4.2vw,46px)}
-    .dial{width:min(360px,30vw);margin:16px auto 8px}
+    .dial{width:min(400px,32vw);margin:16px auto 8px}
+  }
+  @media (min-width:1560px){
+    :root{--wrap:1560px}
+    .dial{width:min(440px,30vw)}
   }
   @media (min-width:840px) and (orientation:landscape) and (max-height:900px){
     .shell{padding-top:22px;padding-bottom:36px}
@@ -216,7 +222,7 @@
     button.primary,button.ghost{padding:15px 20px}
   }
   @media (max-width:560px){
-    .shell{padding:30px 16px 70px}
+    .shell{padding:22px 16px 60px}
     .stats{grid-template-columns:1fr}
     .grid2{grid-template-columns:1fr}
     nav button{padding:9px 10px;font-size:14px}
@@ -250,6 +256,30 @@
   .cheer-t{font-size:18px;font-weight:800;margin-top:4px}
   .cheer-s{font-size:14.5px;color:var(--muted);margin-top:11px;line-height:1.6}
   .cheer .btnrow{justify-content:center}
+
+  /* ── 전체화면 ── */
+  .a-dial{position:relative}
+  .full-btn{position:absolute;top:12px;right:12px;z-index:3;
+    width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);border-radius:9px;background:var(--panel-2);
+    color:var(--muted);cursor:pointer;padding:0}
+  .full-btn:hover{color:var(--text);border-color:var(--muted)}
+
+  body.fullmode header.top{display:none}
+  body.fullmode .bgwrap{opacity:.5}
+  body.fullmode .pill,body.fullmode h1.hero,body.fullmode .hero-sub,
+  body.fullmode .a-setup,body.fullmode .a-goal{display:none}
+  body.fullmode .shell{max-width:none;padding:0;min-height:100vh;
+    display:flex;align-items:center;justify-content:center}
+  body.fullmode #v-timer{width:100%}
+  body.fullmode .tgrid{grid-template-columns:1fr;grid-template-areas:"dial";gap:0}
+  body.fullmode .a-dial{border:0;background:transparent;box-shadow:none;padding:0}
+  body.fullmode .dial{width:min(64vh,74vw);margin:0 auto 14px}
+  body.fullmode .clock{font-size:clamp(52px,9vw,120px)}
+  body.fullmode .mode-tag{font-size:16px}
+  body.fullmode .dial-note{font-size:15px}
+  body.fullmode .full-btn{top:18px;right:18px}
+  body.fullmode button.primary,body.fullmode button.ghost{padding:16px 26px;font-size:17px}
 
   /* ── 체험 버튼 (설정 오른쪽) ── */
   nav button.nav-demo{color:var(--navmuted);opacity:.75;font-weight:600;font-size:14px;
@@ -306,6 +336,9 @@
     </div>
 
     <div class="card a-dial">
+      <button class="full-btn" id="btn-full" title="전체화면으로 보기" aria-label="전체화면으로 보기">
+        <svg id="full-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+      </button>
       <div class="dial">
         <svg viewBox="0 0 300 300" aria-hidden="true">
           <g id="ticks"></g>
@@ -461,6 +494,36 @@ $('theme-btn').onclick=async()=>{
   data.settings.theme=(data.settings.theme==='dark')?'light':'dark';
   applyTheme();await save();
 };
+
+/* ── 전체화면 ──
+   타이머만 크게 띄웁니다. 브라우저가 전체화면을 막으면 창 안에서만 넓힙니다. */
+const FICO={
+  on:'<path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/>',
+  off:'<path d="M8 3v3a2 2 0 01-2 2H3M16 3v3a2 2 0 002 2h3M8 21v-3a2 2 0 00-2-2H3M16 21v-3a2 2 0 012-2h3"/>'
+};
+function isFull(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
+function paintFull(){
+  const on=document.body.classList.contains('fullmode');
+  $('full-ico').innerHTML=on?FICO.off:FICO.on;
+  $('btn-full').title=on?'전체화면 끝내기':'전체화면으로 보기';
+  $('btn-full').setAttribute('aria-label',$('btn-full').title);
+}
+function setFull(on){document.body.classList.toggle('fullmode',on);paintFull();}
+$('btn-full').onclick=async()=>{
+  if(document.body.classList.contains('fullmode')){
+    if(isFull()){try{await (document.exitFullscreen||document.webkitExitFullscreen).call(document);}catch(e){}}
+    setFull(false);
+    return;
+  }
+  const el=document.documentElement;
+  const req=el.requestFullscreen||el.webkitRequestFullscreen;
+  if(req){try{await req.call(el);}catch(e){}}
+  setFull(true);   /* 전체화면이 막혀도 창 안에서 크게 보이도록 */
+};
+/* Esc 로 나갔을 때도 원래 화면으로 되돌립니다. */
+['fullscreenchange','webkitfullscreenchange'].forEach(ev=>
+  document.addEventListener(ev,()=>{if(!isFull())setFull(false);}));
+paintFull();
 
 /* 저장 — 클로드 아티팩트에서는 window.storage, 일반 웹에서는 localStorage */
 const HAS_ART = typeof window.storage === 'object' && window.storage && typeof window.storage.get === 'function';

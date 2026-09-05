@@ -1,0 +1,1035 @@
+<meta charset="utf-8">
+<title>옆 반 선생님의 치타델레</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="하루에 30분, 무엇에 얼마나 집중했는지 기록하는 타이머입니다.">
+<meta name="theme-color" content="#1e3252">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="치타델레">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e3252'/%3E%3Ccircle cx='32' cy='34' r='17' fill='none' stroke='%2317a06a' stroke-width='5'/%3E%3Cpath d='M32 24v11h8' stroke='%23ffffff' stroke-width='4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --navbg:#1e3252; --navtext:#ffffff; --navmuted:#a9bad2;
+    --bg:#f6f6f3; --wash1:rgba(23,160,106,.10); --wash2:rgba(120,140,220,.12);
+    --gridline:rgba(30,50,80,.055);
+    --panel:#ffffff; --panel-2:#fbfaf6;
+    --line:#e4e3dc; --line-soft:#ecebe4;
+    --text:#1f2a37; --muted:#6b7787;
+    --green:#17a06a; --green-dim:#0f7c51; --blue:#2456a6; --blue-soft:#4b7fd6;
+    --warn:#c2762a;
+    --btn:#1e3252; --btn-text:#ffffff;
+    --track:#e6e5de; --shadow:0 1px 2px rgba(30,50,80,.05),0 8px 24px rgba(30,50,80,.05);
+    --radius:14px;
+  }
+  [data-theme="dark"]{
+    --navbg:#0e1830; --navtext:#e6edf7; --navmuted:#8ba0bd;
+    --bg:#0a1122; --wash1:rgba(62,232,154,.10); --wash2:rgba(120,170,255,.09);
+    --gridline:rgba(148,163,184,.05);
+    --panel:#101a2e; --panel-2:#0d1727;
+    --line:rgba(148,163,184,.16); --line-soft:rgba(148,163,184,.09);
+    --text:#e6edf7; --muted:#8ba0bd;
+    --green:#3ee89a; --green-dim:#1f9c68; --blue:#8ec5ff; --blue-soft:#6ba7ee;
+    --warn:#ffb46b;
+    --btn:#3ee89a; --btn-text:#06231a;
+    --track:rgba(148,163,184,.16); --shadow:none;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);
+    font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;
+    font-size:16px;line-height:1.55;min-height:100vh}
+  .bgwrap{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(900px 460px at 8% 4%,var(--wash1),transparent 60%),
+               radial-gradient(820px 420px at 95% 0%,var(--wash2),transparent 58%)}
+  .bgwrap::after{content:'';position:absolute;inset:0;
+    background-image:linear-gradient(var(--gridline) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--gridline) 1px,transparent 1px);
+    background-size:54px 54px;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.35) 50%,transparent 92%);
+            mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.35) 50%,transparent 92%)}
+
+  /* ── 상단 바 ── */
+  header.top{position:relative;z-index:2;background:var(--navbg)}
+  header.top::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;
+    background:linear-gradient(90deg,var(--green),var(--blue-soft))}
+  .top-in{max-width:1040px;margin:0 auto;padding:16px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:18px;white-space:nowrap;letter-spacing:-.02em;color:var(--navtext)}
+  .brand i{display:block;width:4px;height:19px;border-radius:2px;background:var(--green)}
+  nav{display:flex;gap:4px;margin-left:auto}
+  nav button{appearance:none;border:0;background:transparent;color:var(--navmuted);font:inherit;font-weight:700;
+    font-size:15px;padding:9px 13px;border-radius:9px;cursor:pointer}
+  nav button:hover{color:var(--navtext);background:rgba(255,255,255,.08)}
+  nav button[aria-current="page"]{color:#fff;background:rgba(255,255,255,.14)}
+  [data-theme="dark"] nav button[aria-current="page"]{color:var(--green);background:rgba(62,232,154,.12)}
+  .theme-btn{border:0;background:transparent;color:var(--navmuted);cursor:pointer;padding:8px;border-radius:9px;line-height:0}
+  .theme-btn:hover{color:var(--navtext);background:rgba(255,255,255,.08)}
+
+  .shell{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:40px 22px 80px}
+
+  h1.hero{margin:0 0 12px;word-break:keep-all;overflow-wrap:anywhere;font-size:clamp(32px,6vw,50px);font-weight:900;letter-spacing:-.035em;line-height:1.12;
+    background:linear-gradient(96deg,var(--green) 0%,var(--green) 30%,var(--blue) 92%);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-sub{color:var(--muted);margin:0 0 28px;font-size:16px}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--green-dim);
+    background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px;margin-bottom:18px;box-shadow:var(--shadow)}
+  [data-theme="dark"] .pill{color:var(--green);background:rgba(62,232,154,.08);border-color:rgba(62,232,154,.26)}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+  .card+.card{margin-top:18px}
+  h2.sec{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;letter-spacing:-.02em;margin:34px 0 14px}
+  h2.sec i{width:4px;height:19px;border-radius:2px;background:var(--green);display:block}
+
+  label.f{display:block;font-size:14px;font-weight:700;color:var(--muted);margin-bottom:9px}
+  input[type=text],input[type=number],select,textarea{width:100%;background:var(--panel-2);border:1px solid var(--line);
+    color:var(--text);border-radius:11px;padding:15px 16px;font:inherit;font-size:17px}
+  textarea{font-size:13px;line-height:1.5;resize:vertical}
+  input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  input::placeholder{color:var(--muted);opacity:.8}
+  input:disabled,select:disabled{opacity:.55}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .chip{border:1px solid var(--line);background:var(--panel-2);color:var(--muted);border-radius:999px;
+    padding:9px 15px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+  .chip:hover{color:var(--text);border-color:var(--green)}
+  .chip[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+  [data-theme="dark"] .chip[aria-pressed="true"]{background:rgba(62,232,154,.14);color:var(--green)}
+  .chip:disabled{opacity:.45;cursor:not-allowed}
+
+  /* ── 다이얼 ── */
+  .dial{position:relative;width:min(330px,74vw);aspect-ratio:1/1;margin:30px auto 10px}
+  .dial svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block}
+  .rot{transform:rotate(-90deg);transform-origin:150px 150px}
+  .track{fill:none;stroke:var(--track);stroke-width:9}
+  .prog{fill:none;stroke:var(--green);stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset .25s linear}
+  .prog.brk{stroke:var(--blue)}
+  .tick{stroke:var(--track);stroke-width:2}
+  .tick.big{stroke:var(--muted);opacity:.45;stroke-width:3}
+  .tick.on{stroke:var(--green);opacity:1}
+  .tick.on.brk{stroke:var(--blue)}
+  .dial-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;pointer-events:none;text-align:center;padding:0 18%}
+  .mode-tag{font-size:13px;font-weight:800;color:var(--green-dim)}
+  [data-theme="dark"] .mode-tag{color:var(--green)}
+  .mode-tag.brk{color:var(--blue)}
+  .clock{font-size:clamp(44px,10.5vw,60px);font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+  .clock.paused{color:var(--warn)}
+  .dots{display:flex;gap:7px;margin-top:9px}
+  .dots i{width:9px;height:9px;border-radius:50%;background:var(--track);display:block}
+  .dots i.on{background:var(--green)}
+  .dial-note{text-align:center;color:var(--muted);font-size:14px;min-height:22px;margin-bottom:4px}
+
+  .btnrow{display:flex;gap:11px;flex-wrap:wrap;margin-top:20px}
+  button.primary{flex:1 1 190px;background:var(--btn);color:var(--btn-text);border:0;border-radius:12px;padding:17px 22px;
+    font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+  button.primary:hover{filter:brightness(1.12)}
+  button.primary.brk{background:var(--blue);color:#fff}
+  [data-theme="dark"] button.primary.brk{color:#0a2036}
+  button.ghost{flex:0 1 auto;background:transparent;border:1px solid var(--line);color:var(--text);border-radius:12px;
+    padding:17px 20px;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+  button.ghost:hover{border-color:var(--green);color:var(--green-dim)}
+  [data-theme="dark"] button.ghost:hover{color:var(--green)}
+  button.tiny{background:transparent;border:0;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;padding:6px 8px;border-radius:8px}
+  button.tiny:hover{color:#c0392b;background:rgba(192,57,43,.08)}
+
+  .goal-top{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .goal-num{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .goal-num b{color:var(--green-dim)}
+  .goal-num .plus{color:var(--blue);font-size:17px;font-weight:700;margin-left:2px}
+  [data-theme="dark"] .goal-num b{color:var(--green)}
+  .goal-side{margin-left:auto;font-size:14px;color:var(--muted)}
+  .bar{height:11px;border-radius:99px;background:var(--track);overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green-dim),var(--green));width:0;transition:width .4s ease}
+  .done-tag{color:var(--green-dim);font-weight:700}
+  [data-theme="dark"] .done-tag{color:var(--green)}
+
+  .bar.over{height:8px;margin-top:7px}
+  .bar.over i{background:linear-gradient(90deg,var(--blue-soft),var(--blue))}
+  .mini{margin-top:14px;border-top:1px solid var(--line-soft);padding-top:12px;max-height:230px;overflow-y:auto}
+  .mini div{display:flex;align-items:center;gap:12px;font-size:14px;padding:6px 0}
+  .mini .t{color:var(--blue);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .mini .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+  .mini .v{margin-left:auto;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .mini .x{border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;
+    padding:4px 7px;border-radius:7px;line-height:1}
+  .mini .x:hover{color:#c0392b;background:rgba(192,57,43,.08)}
+
+  .day{border-top:1px solid var(--line-soft);padding-top:16px;margin-top:20px}
+  .day:first-of-type{border-top:0;padding-top:0;margin-top:0}
+  .day-head{display:flex;align-items:baseline;gap:10px;margin-bottom:11px;flex-wrap:wrap}
+  .day-date{font-weight:800;font-size:16px}
+  .day-total{margin-left:auto;font-size:14px;color:var(--muted)}
+  .row{display:flex;align-items:center;gap:14px;padding:13px 14px;border-radius:11px;background:var(--panel-2);
+    border:1px solid var(--line-soft);margin-bottom:8px}
+  .row .time{font-variant-numeric:tabular-nums;color:var(--blue);font-weight:700;font-size:15px;white-space:nowrap}
+  .row .topic{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .len{margin-left:auto;font-weight:800;color:var(--green-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+  [data-theme="dark"] .row .len{color:var(--green)}
+  .empty{text-align:center;color:var(--muted);padding:38px 10px}
+  .empty b{display:block;color:var(--text);font-size:16px;margin-bottom:6px}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+  .stat span{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+  .stat b{font-size:24px;font-weight:800;letter-spacing:-.02em}
+  .graph{display:flex;align-items:flex-end;gap:6px;height:130px}
+  .gcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:6px}
+  .gbar{border-radius:5px 5px 2px 2px;background:var(--track);min-height:3px}
+  .gbar.hit{background:linear-gradient(180deg,var(--green),var(--green-dim))}
+  .glabel{text-align:center;font-size:11px;color:var(--muted)}
+  .topic-line{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .topic-line .nm{width:34%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:15px}
+  .topic-line .tb{flex:1;height:9px;border-radius:99px;background:var(--track)}
+  .topic-line .tb i{display:block;height:100%;border-radius:99px;background:var(--blue)}
+  .topic-line .vl{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .note{color:var(--muted);font-size:13.5px;margin-top:12px}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:9;background:var(--navbg);
+    color:#fff;padding:13px 20px;border-radius:12px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;
+    max-width:88vw;text-align:center;box-shadow:0 10px 30px rgba(30,50,80,.25)}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  [hidden]{display:none !important}
+  /* ── 가로 화면(태블릿) 2단 배치 ── */
+  .tgrid{display:grid;gap:18px}
+  .tgrid .card{margin-top:0}
+  .a-dial{display:flex;flex-direction:column;justify-content:center}
+  @media (min-width:840px){
+    .shell{max-width:1140px;padding-top:34px}
+    .tgrid{grid-template-columns:1.02fr .98fr;
+           grid-template-areas:"dial setup" "dial goal";align-items:start}
+    .a-dial{grid-area:dial}
+    .a-setup{grid-area:setup}
+    .a-goal{grid-area:goal}
+    h1.hero{font-size:clamp(36px,4.2vw,46px)}
+    .dial{width:min(360px,30vw);margin:16px auto 8px}
+  }
+  @media (min-width:840px) and (orientation:landscape) and (max-height:900px){
+    .shell{padding-top:22px;padding-bottom:36px}
+    h1.hero{font-size:32px;margin-bottom:6px}
+    .hero-sub{margin-bottom:18px;font-size:15px}
+    .pill{margin-bottom:12px}
+    .card{padding:18px}
+    .dial{width:min(292px,26vw);margin:6px auto 4px}
+    .clock{font-size:46px}
+    .btnrow{margin-top:14px}
+    button.primary,button.ghost{padding:15px 20px}
+  }
+  @media (max-width:560px){
+    .shell{padding:30px 16px 70px}
+    .stats{grid-template-columns:1fr}
+    .grid2{grid-template-columns:1fr}
+    nav button{padding:9px 10px;font-size:14px}
+    .top-in{padding:14px 16px;gap:10px}
+    .brand{font-size:15px;white-space:normal}
+  }
+  /* ── 연속 기록 ── */
+  .streak-box{display:flex;align-items:center;gap:14px;margin-top:16px;padding:13px 15px;
+    border:1px solid var(--line);border-radius:var(--radius);background:var(--panel-2)}
+  .streak-box.hot{border-color:var(--green)}
+  .streak-box.risk{border-color:var(--warn)}
+  .streak-flame{font-size:29px;line-height:1;filter:grayscale(1);opacity:.4}
+  .streak-box.hot .streak-flame{filter:none;opacity:1;animation:flick 2.6s ease-in-out infinite}
+  @keyframes flick{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.1) rotate(-4deg)}}
+  .streak-main{min-width:0}
+  .streak-n{font-size:17px;font-weight:800;letter-spacing:-.02em}
+  .streak-n b{font-size:25px;color:var(--green)}
+  .streak-box.risk .streak-n b{color:var(--warn)}
+  .streak-msg{font-size:13.5px;color:var(--muted);margin-top:1px}
+
+  /* ── 마일스톤 축하 ── */
+  .cheer{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+    background:rgba(10,17,34,.58);padding:24px}
+  .cheer.on{display:flex}
+  .cheer-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;
+    padding:32px 28px;max-width:390px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);
+    animation:pop .35s cubic-bezier(.2,1.3,.4,1)}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  .cheer-ico{font-size:54px;line-height:1}
+  .cheer-n{font-size:36px;font-weight:800;color:var(--green);letter-spacing:-.03em;margin-top:6px}
+  .cheer-t{font-size:18px;font-weight:800;margin-top:4px}
+  .cheer-s{font-size:14.5px;color:var(--muted);margin-top:11px;line-height:1.6}
+  .cheer .btnrow{justify-content:center}
+
+  /* ── 체험 버튼 (설정 오른쪽) ── */
+  nav button.nav-demo{color:var(--navmuted);opacity:.75;font-weight:600;font-size:14px;
+    border:1px dashed rgba(255,255,255,.28);margin-left:6px}
+  nav button.nav-demo:hover{opacity:1;color:var(--navtext)}
+  nav button.nav-demo.on{opacity:1;color:var(--navtext);border-style:solid;
+    border-color:var(--green);background:rgba(23,160,106,.16)}
+
+  /* ── 동기화 상태 ── */
+  .sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted);
+    margin-right:7px;vertical-align:1px}
+  .sync-dot.ok{background:var(--green)} .sync-dot.err,.sync-dot.auth{background:#c0392b}
+  .sync-dot.busy{background:var(--warn)}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none !important}
+    .streak-box.hot .streak-flame,.cheer-card{animation:none !important}}
+</style>
+
+<div class="bgwrap"></div>
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><i></i>옆 반 선생님의 치타델레(Zitadelle)</div>
+    <nav>
+      <button data-view="timer" aria-current="page">타이머</button>
+      <button data-view="log">기록</button>
+      <button data-view="stat">통계</button>
+      <button data-view="set">설정</button>
+      <button id="nav-demo" class="nav-demo" title="예시 기록으로 미리 보기">체험</button>
+    </nav>
+    <button class="theme-btn" id="theme-btn" title="밝게/어둡게 바꾸기" aria-label="밝게/어둡게 바꾸기">
+      <svg id="theme-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></svg>
+    </button>
+  </div>
+</header>
+
+<div class="shell">
+  <section id="v-timer">
+    <div class="pill"><span class="dot"></span><span id="pill-txt">하루 30분</span></div>
+    <h1 class="hero">치타델레(Zitadelle)</h1>
+    <p class="hero-sub">치타델레는 독일어로 성채나 요새 안의 작은 보루, 내성을 의미합니다.</p>
+
+    <div class="tgrid">
+    <div class="card a-setup">
+      <label class="f" for="topic">오늘의 활동을 적어주세요.</label>
+      <input type="text" id="topic" placeholder="예: 6학년 미디어 수업 자료 만들기" autocomplete="off">
+      <div class="chips" id="recent"></div>
+      <div class="chips" id="durs" style="margin-top:18px">
+        <button class="chip" data-min="15">15분</button>
+        <button class="chip" data-min="25">25분</button>
+        <button class="chip" data-min="30" aria-pressed="true">30분</button>
+        <button class="chip" data-min="45">45분</button>
+        <button class="chip" data-min="60">60분</button>
+      </div>
+    </div>
+
+    <div class="card a-dial">
+      <div class="dial">
+        <svg viewBox="0 0 300 300" aria-hidden="true">
+          <g id="ticks"></g>
+          <g class="rot">
+            <circle class="track" cx="150" cy="150" r="120"></circle>
+            <circle class="prog" id="prog" cx="150" cy="150" r="120" stroke-dasharray="753.98" stroke-dashoffset="0"></circle>
+          </g>
+        </svg>
+        <div class="dial-mid">
+          <div class="mode-tag" id="mode-tag">집중</div>
+          <div class="clock" id="clock">30:00</div>
+          <div class="dots" id="dots"></div>
+        </div>
+      </div>
+      <div class="dial-note" id="dial-note">시작을 누르면 시각이 기록됩니다</div>
+
+      <div class="btnrow">
+        <button class="primary" id="btn-main">집중 시작</button>
+        <button class="ghost" id="btn-stop" hidden>여기까지 기록</button>
+        <button class="ghost" id="btn-cancel" hidden>버리기</button>
+      </div>
+    </div>
+
+    <div class="card a-goal">
+      <div class="goal-top">
+        <div class="goal-num" id="today-num"><b>0분</b> / 30분</div>
+        <div class="goal-side" id="streak-txt"></div>
+      </div>
+      <div class="streak-box" id="streak-box" hidden>
+        <div class="streak-flame" id="streak-flame">🔥</div>
+        <div class="streak-main">
+          <div class="streak-n"><b id="streak-n">0</b>일 연속</div>
+          <div class="streak-msg" id="streak-msg"></div>
+        </div>
+      </div>
+      <div class="bar"><i id="today-bar"></i></div>
+      <div class="bar over" id="over-wrap" hidden><i id="over-bar"></i></div>
+      <div class="note" id="today-note">아직 오늘 기록이 없습니다.</div>
+      <div id="today-list"></div>
+    </div>
+    </div>
+  </section>
+
+  <section id="v-log" hidden>
+    <h1 class="hero" style="font-size:clamp(28px,5vw,40px)">집중 기록</h1>
+    <p class="hero-sub">날짜별로, 몇 시부터 몇 시까지 무엇에 집중했는지 남습니다.</p>
+    <div class="card" id="log-body"></div>
+  </section>
+
+  <section id="v-stat" hidden>
+    <h1 class="hero" style="font-size:clamp(28px,5vw,40px)">돌아보기</h1>
+    <p class="hero-sub">2주 동안의 흐름과, 시간을 가장 많이 쓴 주제입니다.</p>
+    <div class="stats">
+      <div class="stat"><span>연속 달성</span><b id="s-streak">0일</b></div>
+      <div class="stat"><span>목표를 채운 날</span><b id="s-days">0일</b></div>
+      <div class="stat"><span>모두 더한 시간</span><b id="s-total">0분</b></div>
+    </div>
+    <h2 class="sec"><i></i>최근 14일</h2>
+    <div class="card">
+      <div class="graph" id="graph"></div>
+      <div class="note">초록색 막대는 목표를 채운 날입니다.</div>
+    </div>
+    <h2 class="sec"><i></i>주제별 누적</h2>
+    <div class="card" id="topics"></div>
+  </section>
+
+  <section id="v-set" hidden>
+    <h1 class="hero" style="font-size:clamp(28px,5vw,40px)">설정</h1>
+    <p class="hero-sub">목표와 휴식 길이를 바꾸고, 기록을 내보낼 수 있습니다.</p>
+    <div class="card">
+      <div class="grid2">
+        <div>
+          <label class="f" for="goal-min">하루 목표 (분)</label>
+          <input type="number" id="goal-min" min="5" max="600" step="5" value="30">
+        </div>
+        <div>
+          <label class="f" for="break-min">휴식 길이 (분)</label>
+          <input type="number" id="break-min" min="0" max="60" step="1" value="5">
+        </div>
+        <div>
+          <label class="f" for="snd">타이머 종료 알림</label>
+          <select id="snd"><option value="1">소리로 알리기</option><option value="0">조용히 끝내기</option></select>
+        </div>
+        <div>
+          <label class="f" for="autob">집중이 끝나면</label>
+          <select id="autob"><option value="1">휴식 타이머 바로 시작</option><option value="0">멈추고 기다리기</option></select>
+        </div>
+      </div>
+      <div class="note">휴식 길이를 0으로 두면 휴식 없이 집중만 반복합니다. 집중하는 동안에는 태블릿 화면이 꺼지지 않도록 잡아 둡니다.</div>
+    </div>
+    <h2 class="sec"><i></i>체험용 예시 기록</h2>
+    <div class="card">
+      <p class="note" style="margin-top:0">약 100일치 예시 기록을 채워 연속 기록과 통계가 어떻게 보이는지 미리 확인할 수 있습니다. 예시 기록은 <b>이 기기에만</b> 저장되고 서버로는 전송되지 않아, 실제 기록과 섞이지 않습니다.</p>
+      <div class="btnrow">
+        <button class="ghost" id="btn-demo-on2">예시 기록 채우기</button>
+        <button class="ghost" id="btn-demo-off2">예시 기록만 지우기</button>
+      </div>
+    </div>
+    <h2 class="sec"><i></i>기기 간 동기화</h2>
+    <div class="card">
+      <p class="note" style="margin-top:0">암호를 넣으면 PC·태블릿·휴대폰이 같은 기록을 봅니다. 기기마다 한 번만 넣으면 됩니다. 암호는 이 기기에만 저장됩니다.</p>
+      <label class="f" for="sync-key">동기화 암호</label>
+      <input type="password" id="sync-key" placeholder="서버에 정해 둔 암호" autocomplete="off">
+      <div class="btnrow">
+        <button class="ghost" id="btn-sync-save">저장하고 맞추기</button>
+        <button class="ghost" id="btn-sync-now">지금 맞추기</button>
+        <button class="ghost" id="btn-sync-off">이 기기에서 끄기</button>
+      </div>
+      <div class="note" id="sync-note">아직 설정하지 않았습니다. 이 기기에만 기록이 쌓입니다.</div>
+    </div>
+    <h2 class="sec"><i></i>기록 내보내기</h2>
+    <div class="card">
+      <p class="note" style="margin-top:0">아래 내용을 복사해 스프레드시트에 붙여 넣으면 표가 됩니다.</p>
+      <textarea id="csv" rows="7" readonly></textarea>
+      <div class="btnrow"><button class="ghost" id="btn-refresh-csv">지금 기록으로 다시 만들기</button></div>
+    </div>
+    <h2 class="sec"><i></i>기록 지우기</h2>
+    <div class="card">
+      <p class="note" style="margin-top:0">모든 집중 기록이 사라지고 되돌릴 수 없습니다.</p>
+      <div class="btnrow"><button class="ghost" id="btn-wipe" style="border-color:#e0b4b4;color:#c0392b">전체 기록 지우기</button></div>
+    </div>
+  </section>
+</div>
+<div class="cheer" id="cheer" role="dialog" aria-modal="true" aria-labelledby="cheer-t">
+  <div class="cheer-card">
+    <div class="cheer-ico" id="cheer-ico">🔥</div>
+    <div class="cheer-n" id="cheer-n">7일</div>
+    <div class="cheer-t" id="cheer-t">연속 달성</div>
+    <div class="cheer-s" id="cheer-s"></div>
+    <div class="btnrow"><button class="primary" id="cheer-ok">고맙습니다</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='focus-lab-v1', CIRC=2*Math.PI*120;
+let data={settings:{goalMin:30,breakMin:5,sound:1,autoBreak:1,theme:'light'},sessions:[],active:null,
+  deleted:[],settingsAt:0,celebrated:[]};
+let tickId=null, wake=null, actx=null, pickMin=30, lastLit=-1;
+const $=id=>document.getElementById(id);
+
+/* 테마 */
+const ICO={
+  light:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  dark:'<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>'
+};
+function applyTheme(){
+  const t=data.settings.theme==='dark'?'dark':'light';
+  document.documentElement.dataset.theme=t;
+  $('theme-ico').innerHTML=t==='dark'?ICO.light:ICO.dark;
+}
+$('theme-btn').onclick=async()=>{
+  data.settings.theme=(data.settings.theme==='dark')?'light':'dark';
+  applyTheme();await save();
+};
+
+/* 저장 — 클로드 아티팩트에서는 window.storage, 일반 웹에서는 localStorage */
+const HAS_ART = typeof window.storage === 'object' && window.storage && typeof window.storage.get === 'function';
+const store={
+  async read(){
+    if(HAS_ART){try{const r=await window.storage.get(KEY);return r&&r.value?r.value:null;}catch(e){return null;}}
+    try{return localStorage.getItem(KEY);}catch(e){return null;}
+  },
+  async write(v){
+    if(HAS_ART){await window.storage.set(KEY,v);return;}
+    localStorage.setItem(KEY,v);
+  }
+};
+
+/* ── 서버 동기화 ──
+   기록은 늘 이 기기에 먼저 저장되고, 그 다음 서버와 맞춥니다.
+   인터넷이 끊겨도 기록은 남고, 연결되면 자동으로 다시 맞춥니다.
+   암호는 이 기기에만 저장되며 서버로는 확인용으로만 전송됩니다. */
+const SKEY='zitadelle-sync-key';
+const CAN_SYNC = !HAS_ART && (location.protocol==='http:'||location.protocol==='https:');
+const sync={
+  state:'off',           /* off | ok | busy | err | auth */
+  at:0,
+  key(){try{return localStorage.getItem(SKEY)||'';}catch(e){return '';}},
+  setKey(v){try{v?localStorage.setItem(SKEY,v):localStorage.removeItem(SKEY);}catch(e){}
+    this.state=v?'busy':'off';renderSync();},
+  on(){return CAN_SYNC&&!!this.key();},
+  async run(){
+    if(!this.on()){this.state='off';renderSync();return false;}
+    if(this._busy)return false;
+    this._busy=true;this.state='busy';renderSync();
+    try{
+      /* 체험용 예시 기록(demo)은 서버로 보내지 않습니다. */
+      const mine=data.sessions.filter(s=>!s.demo);
+      const demo=data.sessions.filter(s=>s.demo);
+      const r=await fetch('api/data',{method:'PUT',
+        headers:{'Content-Type':'application/json','X-Zita-Key':this.key()},
+        body:JSON.stringify({sessions:mine,deleted:data.deleted,
+          settings:data.settings,settingsAt:data.settingsAt})});
+      if(r.status===401){this.state='auth';renderSync();return false;}
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const j=await r.json();
+      /* 서버가 돌려준 기록에 이 기기의 예시 기록을 다시 붙입니다. */
+      data.sessions=(Array.isArray(j.sessions)?j.sessions:mine).concat(demo)
+        .sort((a,b)=>a.start-b.start);
+      data.deleted=Array.isArray(j.deleted)?j.deleted:data.deleted;
+      if(j.settings&&(Number(j.settingsAt)||0)>(data.settingsAt||0)){
+        data.settings=Object.assign(data.settings,j.settings);
+        data.settingsAt=Number(j.settingsAt)||0;
+        lastSettings=JSON.stringify(data.settings);
+      }
+      try{await store.write(JSON.stringify(data));}catch(e){}
+      this.state='ok';this.at=Date.now();renderSync();
+      return true;
+    }catch(e){
+      this.state='err';renderSync();return false;
+    }finally{this._busy=false;}
+  }
+};
+
+/* 저장할 때마다 곧바로 보내지 않고 잠깐 모았다가 한 번에 보냅니다. */
+let syncTimer=null;
+function syncSoon(ms){
+  if(!sync.on())return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(async()=>{
+    const ok=await sync.run();
+    if(ok)refreshAll();
+  },ms===undefined?1200:ms);
+}
+function refreshAll(){
+  renderTimer();
+  if(!$('v-log').hidden)renderLog();
+  if(!$('v-stat').hidden)renderStat();
+  if(!$('v-set').hidden)renderSettings();
+}
+async function load(){
+  try{const raw=await store.read();
+    if(raw){const p=JSON.parse(raw);
+      data.sessions=Array.isArray(p.sessions)?p.sessions:[];
+      data.active=p.active||null;
+      data.deleted=Array.isArray(p.deleted)?p.deleted:[];
+      data.celebrated=Array.isArray(p.celebrated)?p.celebrated:[];
+      data.settingsAt=Number(p.settingsAt)||0;
+      data.settings=Object.assign(data.settings,p.settings||{});}
+  }catch(e){}
+  lastSettings=JSON.stringify(data.settings);
+}
+/* 설정이 바뀐 순간을 기록해 둔다. 기기 여러 대가 서로 다른 설정을 올렸을 때
+   더 나중에 바꾼 쪽이 이기도록 서버가 판단하는 근거가 된다. */
+let lastSettings=null;
+async function save(){
+  const cur=JSON.stringify(data.settings);
+  if(lastSettings!==null&&cur!==lastSettings)data.settingsAt=Date.now();
+  lastSettings=cur;
+  try{await store.write(JSON.stringify(data));}
+  catch(e){toast('저장하지 못했습니다. 브라우저의 시크릿 모드에서는 기록이 남지 않습니다.');}
+  syncSoon();
+}
+
+/* 지운 기록의 id 를 남겨 둔다. 다른 기기가 아직 그 기록을 들고 있어도
+   서버가 이 목록을 보고 되살리지 않는다. */
+function markDeleted(id){
+  const k=String(id);
+  if(!data.deleted.some(x=>String(x)===k))data.deleted.push(k);
+}
+
+/* 시간 */
+const pad=n=>String(n).padStart(2,'0');
+const dayKey=ms=>{const d=new Date(ms);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
+const hhmm=ms=>{const d=new Date(ms);return pad(d.getHours())+':'+pad(d.getMinutes());};
+const mmss=s=>{s=Math.max(0,Math.round(s));return pad(Math.floor(s/60))+':'+pad(s%60);};
+function human(sec){const m=Math.round(sec/60);if(m<60)return m+'분';const h=Math.floor(m/60),r=m%60;return r?h+'시간 '+r+'분':h+'시간';}
+function korDate(k){const [y,m,d]=k.split('-').map(Number);const dt=new Date(y,m-1,d);
+  const w=['일','월','화','수','목','금','토'][dt.getDay()];
+  if(k===dayKey(Date.now()))return '오늘 · '+m+'월 '+d+'일 '+w+'요일';
+  if(k===dayKey(Date.now()-864e5))return '어제 · '+m+'월 '+d+'일 '+w+'요일';
+  return m+'월 '+d+'일 '+w+'요일';}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function totalsByDay(){const t={};data.sessions.forEach(s=>{const k=dayKey(s.start);t[k]=(t[k]||0)+s.sec;});return t;}
+function todaySec(){return totalsByDay()[dayKey(Date.now())]||0;}
+function todayCount(){const k=dayKey(Date.now());return data.sessions.filter(s=>dayKey(s.start)===k).length;}
+function streakDays(){const g=data.settings.goalMin*60,t=totalsByDay();let d=new Date(),n=0;
+  if((t[dayKey(d.getTime())]||0)<g)d.setDate(d.getDate()-1);
+  while((t[dayKey(d.getTime())]||0)>=g){n++;d.setDate(d.getDate()-1);}return n;}
+
+/* 눈금 */
+(function buildTicks(){
+  let h='';
+  for(let i=0;i<60;i++){
+    const a=(i*6-90)*Math.PI/180, big=i%5===0;
+    const r1=big?128:131, r2=138;
+    h+='<line class="tick'+(big?' big':'')+'" x1="'+(150+r1*Math.cos(a)).toFixed(1)+'" y1="'+(150+r1*Math.sin(a)).toFixed(1)
+      +'" x2="'+(150+r2*Math.cos(a)).toFixed(1)+'" y2="'+(150+r2*Math.sin(a)).toFixed(1)+'"></line>';
+  }
+  $('ticks').innerHTML=h;
+})();
+const TICKS=[...document.querySelectorAll('.tick')];
+
+/* 화면 전환 */
+const V={timer:$('v-timer'),log:$('v-log'),stat:$('v-stat'),set:$('v-set')};
+document.querySelectorAll('nav button[data-view]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button[data-view]').forEach(x=>x.removeAttribute('aria-current'));
+  b.setAttribute('aria-current','page');
+  Object.keys(V).forEach(k=>V[k].hidden=(k!==b.dataset.view));
+  if(b.dataset.view==='log')renderLog();
+  if(b.dataset.view==='stat')renderStat();
+  if(b.dataset.view==='set')renderSettings();
+  window.scrollTo({top:0});
+});
+
+/* 길이 선택 */
+document.querySelectorAll('#durs .chip').forEach(c=>c.onclick=()=>{
+  if(data.active)return;
+  document.querySelectorAll('#durs .chip').forEach(x=>x.setAttribute('aria-pressed','false'));
+  c.setAttribute('aria-pressed','true');
+  pickMin=Number(c.dataset.min);
+  paint(0,pickMin*60,'focus');
+});
+
+/* 타이머 */
+function elapsed(){const a=data.active;if(!a)return 0;return a.acc+(a.running?(Date.now()-a.since)/1000:0);}
+function paint(el,target,mode){
+  const p=target?Math.min(1,el/target):0, brk=mode==='break';
+  const pr=$('prog');
+  pr.classList.toggle('brk',brk);
+  pr.setAttribute('stroke-dashoffset',String(CIRC*p));
+  $('clock').textContent=mmss(target-el);
+  const lit=Math.round(p*60);
+  if(lit!==lastLit){TICKS.forEach((t,i)=>{t.classList.toggle('on',i<lit);t.classList.toggle('brk',brk);});lastLit=lit;}
+}
+function renderDots(){
+  const n=todayCount(), cur=n%4===0&&n>0?4:n%4;
+  $('dots').innerHTML=[0,1,2,3].map(i=>'<i class="'+(i<cur?'on':'')+'"></i>').join('');
+}
+function renderTimer(){
+  renderDemoBar();
+  const a=data.active, m=$('btn-main');
+  document.querySelectorAll('#durs .chip').forEach(c=>c.disabled=!!a);
+  if(!a){
+    m.textContent='집중 시작';m.classList.remove('brk');
+    $('btn-stop').hidden=true;$('btn-cancel').hidden=true;
+    $('clock').classList.remove('paused');$('topic').disabled=false;
+    $('mode-tag').textContent='집중';$('mode-tag').classList.remove('brk');
+    $('dial-note').textContent='시작을 누르면 시각이 기록됩니다';
+    paint(0,pickMin*60,'focus');
+  }else if(a.mode==='focus'){
+    m.textContent=a.running?'잠시 멈춤':'이어서 집중';m.classList.remove('brk');
+    $('btn-stop').hidden=false;$('btn-stop').textContent='여기까지 기록';
+    $('btn-cancel').hidden=false;$('btn-cancel').textContent='버리기';
+    $('clock').classList.toggle('paused',!a.running);$('topic').disabled=true;
+    $('mode-tag').textContent='집중';$('mode-tag').classList.remove('brk');
+    $('dial-note').textContent=hhmm(a.start)+' 시작 · '+a.topic;
+    paint(elapsed(),a.target,'focus');
+  }else{
+    m.textContent=a.running?'잠시 멈춤':'이어서 쉬기';m.classList.add('brk');
+    $('btn-stop').hidden=true;
+    $('btn-cancel').hidden=false;$('btn-cancel').textContent='휴식 건너뛰기';
+    $('clock').classList.toggle('paused',!a.running);$('topic').disabled=true;
+    $('mode-tag').textContent='휴식';$('mode-tag').classList.add('brk');
+    $('dial-note').textContent='잠깐 쉬었다가 이어서 하세요';
+    paint(elapsed(),a.target,'break');
+  }
+  renderDots();renderGoal();
+}
+function renderGoal(){
+  const g=data.settings.goalMin*60,t=todaySec(),n=streakDays(),cnt=todayCount();
+  $('today-num').innerHTML='<b>'+human(t)+'</b> / '+data.settings.goalMin+'분'
+    +(t>g?' <span class="plus">+'+human(t-g)+'</span>':'');
+  $('today-bar').style.width=Math.min(100,t/g*100)+'%';
+  const over=Math.max(0,t-g);
+  $('over-wrap').hidden=over<=0;
+  $('over-bar').style.width=Math.min(100,over/g*100)+'%';
+  $('streak-txt').textContent=(cnt?cnt+'회 · ':'')+(n?'연속 '+n+'일째':'');
+  renderStreak(n,t>=g);
+  $('pill-txt').textContent='하루 '+data.settings.goalMin+'분';
+  if(t>=g)$('today-note').innerHTML='<span class="done-tag">오늘 목표를 채웠습니다.</span> 더 하고 싶으면 계속 이어서 하세요. 넘긴 만큼 파란 줄로 쌓입니다.';
+  else if(t>0)$('today-note').textContent=human(g-t)+' 더 하면 오늘 목표를 채웁니다.';
+  else $('today-note').textContent='아직 오늘 기록이 없습니다.';
+  const k=dayKey(Date.now());
+  const list=data.sessions.filter(s=>dayKey(s.start)===k).sort((a,b)=>b.start-a.start);
+  const box=$('today-list');
+  box.className=list.length?'mini':'';
+  box.innerHTML=list.map(s=>'<div><span class="t">'+hhmm(s.start)+'–'+hhmm(s.end)+'</span>'
+    +'<span class="n">'+esc(s.topic)+'</span><span class="v">'+human(s.sec)+'</span>'
+    +'<button class="x" data-del="'+s.id+'" aria-label="이 기록 지우기">지우기</button></div>').join('');
+  box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>removeSession(b.dataset.del));
+  renderRecent();
+}
+async function removeSession(id){
+  const s=data.sessions.find(x=>String(x.id)===String(id));if(!s)return;
+  if(!confirm(hhmm(s.start)+'에 시작한 「'+s.topic+'」 '+human(s.sec)+' 기록을 지울까요?'))return;
+  data.sessions=data.sessions.filter(x=>String(x.id)!==String(id));
+  markDeleted(id);
+  await save();renderGoal();renderDots();toast('기록을 지웠습니다.');
+}
+/* ── 연속 기록 응원 ── */
+const MILESTONES=[3,7,14,30,50,100,150,200,250,300,365,500,730,1000];
+function milestoneText(n){
+  if(n>=1000)return{ico:'🏛️',t:'천 일을 넘겼습니다',s:'1000일. 더 보탤 말이 없습니다. 그저 대단합니다.'};
+  if(n>=730)return{ico:'🏛️',t:'2년째 이어집니다',s:'두 해 동안 하루도 놓지 않으셨습니다.'};
+  if(n>=500)return{ico:'👑',t:'500일',s:'이쯤 되면 재능이 아니라 태도의 문제입니다.'};
+  if(n>=365)return{ico:'🎉',t:'1년을 채웠습니다',s:'365일 연속. 작년 오늘의 선생님이 오늘의 선생님을 만들었습니다.'};
+  if(n>=300)return{ico:'🌟',t:'300일',s:'한 해의 대부분을 지켜내셨습니다.'};
+  if(n>=250)return{ico:'🌟',t:'250일',s:'이제 이 시간이 하루의 기준점이 되었겠네요.'};
+  if(n>=200)return{ico:'💎',t:'200일',s:'200일. 흔들린 날도 있었을 텐데 이어오셨습니다.'};
+  if(n>=150)return{ico:'💎',t:'150일',s:'절반의 절반을 넘어 계속 가고 있습니다.'};
+  if(n>=100)return{ico:'💯',t:'백 일을 채웠습니다',s:'100일. 옛말에 백일이면 무엇이든 이룬다고 했습니다.'};
+  if(n>=50)return{ico:'⭐',t:'50일',s:'쉬어 갈 이유는 늘 있었을 텐데, 그러지 않으셨습니다.'};
+  if(n>=30)return{ico:'🔥',t:'한 달을 채웠습니다',s:'30일 연속. 이제 하다 말다가 아니라 그냥 하는 일이 되었습니다.'};
+  if(n>=14)return{ico:'🔥',t:'2주 연속',s:'2주를 넘기면 몸이 시간을 기억하기 시작합니다.'};
+  if(n>=7)return{ico:'🔥',t:'일주일 연속',s:'7일. 가장 그만두기 쉬운 구간을 지나오셨습니다.'};
+  return{ico:'✨',t:'3일 연속',s:'사흘째입니다. 여기서부터가 진짜 시작입니다.'};
+}
+function nextMilestone(n){for(const m of MILESTONES)if(m>n)return m;return null;}
+
+function renderStreak(n,doneToday){
+  const box=$('streak-box');
+  if(!n&&!doneToday){box.hidden=true;return;}
+  box.hidden=false;
+  box.classList.toggle('hot',doneToday&&n>0);
+  box.classList.toggle('risk',!doneToday&&n>0);
+  $('streak-n').textContent=n;
+  const nx=nextMilestone(n);
+  let msg;
+  if(!doneToday&&n>0){
+    msg='오늘 목표를 채우면 '+(n+1)+'일째가 됩니다. 아직 늦지 않았습니다.';
+  }else if(nx){
+    msg=nx+'일까지 '+(nx-n)+'일 남았습니다.';
+  }else{
+    msg='기록을 계속 이어가고 계십니다.';
+  }
+  $('streak-msg').textContent=msg;
+  $('streak-flame').textContent=(!doneToday&&n>0)?'🕯️':'🔥';
+}
+
+/* 마일스톤에 처음 도달한 날에만 한 번 축하합니다. */
+function checkCheer(){
+  const n=streakDays();
+  if(!MILESTONES.includes(n))return;
+  const tag='s'+n;
+  if(data.celebrated.some(x=>String(x)===tag))return;
+  data.celebrated.push(tag);
+  save();
+  const m=milestoneText(n);
+  $('cheer-ico').textContent=m.ico;
+  $('cheer-n').textContent=n+'일';
+  $('cheer-t').textContent=m.t;
+  $('cheer-s').textContent=m.s;
+  $('cheer').classList.add('on');
+  $('cheer-ok').focus();
+}
+$('cheer-ok').onclick=()=>$('cheer').classList.remove('on');
+$('cheer').onclick=e=>{if(e.target===$('cheer'))$('cheer').classList.remove('on');};
+
+/* ── 체험용 예시 기록 ──
+   demo:true 표시가 붙은 기록은 이 기기에만 남고 서버로는 절대 보내지 않습니다.
+   덕분에 체험하는 분들끼리도, 실제 기록과도 섞이지 않습니다. */
+const DEMO_TOPICS=['6학년 미디어 수업 자료 만들기','학급 문집 편집','학년 협의회 준비',
+  '수학 평가 문항 검토','오늘 수업 성찰 기록','원격 연수 이수','학부모 상담 준비',
+  '과학 실험 준비물 챙기기','온작품읽기 발문 짜기','아이들 일기 답글 쓰기'];
+function hasDemo(){return data.sessions.some(s=>s.demo);}
+function seedDemo(){
+  const g=(data.settings.goalMin||30)*60;
+  const DAYS=150, STREAK=103;   /* 최근 103일은 매일 목표 달성, 그 앞은 띄엄띄엄 */
+  const out=[];
+  for(let d=0;d<DAYS;d++){
+    const base=new Date();base.setHours(0,0,0,0);base.setDate(base.getDate()-d);
+    if(d===STREAK)continue;                     /* 연속을 끊는 날 */
+    const inStreak=d<STREAK;
+    if(!inStreak&&(d%3===1))continue;           /* 예전에는 빠진 날들이 있었던 것처럼 */
+    const total=inStreak?g+((d*7)%5)*300:Math.round(g*0.55);
+    let left=total, slot=0;
+    while(left>=600&&slot<3){
+      const sec=(slot===2||left<2400)?left:Math.min(left,1500+((d*11)%4)*300);
+      const start=base.getTime()+(9+slot*3)*3600000+((d*13)%50)*60000;
+      out.push({id:start,topic:DEMO_TOPICS[(d+slot)%DEMO_TOPICS.length],
+        start:start,end:start+sec*1000,sec:sec,demo:true});
+      left-=sec;slot++;
+    }
+  }
+  data.sessions=data.sessions.concat(out).sort((a,b)=>a.start-b.start);
+}
+async function startDemo(){
+  if(hasDemo()){toast('이미 예시 기록이 들어 있습니다.');return;}
+  if(!confirm('약 100일치 예시 기록을 채워, 기록이 쌓이면 어떻게 보이는지 미리 확인합니다.\n\n예시 기록은 이 기기에만 저장되고 서버로 가지 않습니다. 직접 기록하신 내용은 그대로 남습니다.\n\n계속할까요?'))return;
+  seedDemo();
+  data.celebrated=[];            /* 축하 화면을 다시 볼 수 있게 */
+  await save();refreshAll();
+  toast('예시 기록을 채웠습니다. 통계 화면도 함께 보세요.');
+}
+async function clearDemo(){
+  if(!hasDemo()){toast('예시 기록이 없습니다.');return;}
+  if(!confirm('예시 기록만 지웁니다. 직접 기록하신 내용은 그대로 남습니다. 계속할까요?'))return;
+  data.sessions=data.sessions.filter(s=>!s.demo);
+  await save();refreshAll();
+  toast('예시 기록을 지웠습니다.');
+}
+function renderDemoBar(){
+  const b=$('nav-demo');if(!b)return;
+  const on=hasDemo();
+  b.textContent=on?'체험 끄기':'체험';
+  b.classList.toggle('on',on);
+  b.title=on?'예시 기록을 지우고 원래대로 돌아갑니다'
+            :'예시 기록으로 미리 보기';
+}
+
+/* ── 동기화 화면 표시 ── */
+function renderSync(){
+  const el=$('sync-note');if(!el)return;
+  const k=sync.key();
+  const txt={
+    off:k?'맞추는 중입니다.':'아직 설정하지 않았습니다. 이 기기에만 기록이 쌓입니다.',
+    busy:'서버와 맞추는 중입니다.',
+    ok:'맞춰졌습니다. 마지막 '+(sync.at?hhmm(sync.at):'')+'. 기록 '+data.sessions.length+'개.',
+    err:'서버에 연결하지 못했습니다. 기록은 이 기기에 안전하게 남아 있고, 연결되면 자동으로 맞춥니다.',
+    auth:'암호가 맞지 않습니다. 다시 입력해 주세요.'
+  }[sync.state]||'';
+  const cls=sync.state==='off'?'':sync.state;
+  el.innerHTML='<span class="sync-dot '+cls+'"></span>'+esc(txt);
+  if(!CAN_SYNC)el.innerHTML='<span class="sync-dot"></span>이 환경에서는 동기화를 쓸 수 없습니다.';
+}
+
+function renderRecent(){
+  const seen=[],box=$('recent');
+  for(let i=data.sessions.length-1;i>=0&&seen.length<4;i--){
+    const tp=data.sessions[i].topic;if(tp&&!seen.includes(tp))seen.push(tp);}
+  box.innerHTML='';
+  seen.forEach(tp=>{const b=document.createElement('button');b.className='chip';b.textContent=tp;
+    b.disabled=!!data.active;b.onclick=()=>{if(!data.active)$('topic').value=tp;};box.appendChild(b);});
+}
+
+async function startFocus(){
+  const tp=$('topic').value.trim();
+  if(!tp){$('topic').focus();toast('무엇에 집중할지 한 줄만 적어 주세요.');return;}
+  const now=Date.now();
+  data.active={mode:'focus',topic:tp,target:pickMin*60,start:now,since:now,acc:0,running:true};
+  ensureAudio();lockScreen();runTick();renderTimer();await save();
+}
+function startBreak(topic){
+  const b=data.settings.breakMin;
+  if(!b){data.active=null;renderTimer();save();return;}
+  const now=Date.now();
+  data.active={mode:'break',topic:topic,target:b*60,start:now,since:now,acc:0,running:true};
+  lockScreen();runTick();renderTimer();save();
+}
+async function pause(){const a=data.active;a.acc=elapsed();a.running=false;a.since=null;
+  stopTick();release();renderTimer();await save();}
+async function resume(){const a=data.active;a.since=Date.now();a.running=true;
+  lockScreen();runTick();renderTimer();await save();}
+
+async function finish(auto){
+  const a=data.active;if(!a)return;
+  stopTick();release();
+  if(a.mode==='break'){
+    data.active=null;if(auto&&data.settings.sound)beep(1);
+    renderTimer();await save();if(auto)toast('휴식이 끝났습니다. 다시 시작할 준비가 됐어요.');return;
+  }
+  const sec=Math.round(auto?a.target:elapsed());
+  data.active=null;
+  if(sec>=60){
+    const g=data.settings.goalMin*60, before=todaySec();
+    data.sessions.push({id:a.start,topic:a.topic,start:a.start,end:a.start+sec*1000,sec:sec});
+    toast(human(sec)+' 기록했습니다.'+((before<g&&todaySec()>=g)?' 오늘 목표 달성!':''));
+  }else toast('1분이 되지 않아 기록하지 않았습니다.');
+  if(auto&&data.settings.sound)beep(0);
+  $('topic').value=a.topic;
+  await save();
+  checkCheer();
+  if(auto&&data.settings.autoBreak&&data.settings.breakMin>0)startBreak(a.topic);
+  else renderTimer();
+}
+async function cancel(){
+  const a=data.active;stopTick();release();
+  const wasBreak=a&&a.mode==='break', tp=a?a.topic:'';
+  data.active=null;$('topic').value=tp;
+  renderTimer();await save();
+  toast(wasBreak?'휴식을 건너뛰었습니다.':'기록하지 않고 지웠습니다.');
+}
+function runTick(){stopTick();tickId=setInterval(()=>{
+  const a=data.active;if(!a||!a.running)return;
+  const el=elapsed();paint(el,a.target,a.mode);
+  if(el>=a.target)finish(true);
+},250);}
+function stopTick(){if(tickId){clearInterval(tickId);tickId=null;}}
+
+$('btn-main').onclick=()=>{const a=data.active;if(!a)startFocus();else a.running?pause():resume();};
+$('btn-stop').onclick=()=>finish(false);
+$('btn-cancel').onclick=()=>{const a=data.active;
+  if(a&&a.mode==='break'){cancel();return;}
+  if(confirm('이번 집중을 기록하지 않고 지울까요?'))cancel();};
+
+/* 화면 잠금 · 소리 */
+async function lockScreen(){try{if('wakeLock' in navigator)wake=await navigator.wakeLock.request('screen');}catch(e){}}
+function release(){try{if(wake){wake.release();wake=null;}}catch(e){}}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    if(data.active&&data.active.running){lockScreen();runTick();}
+    renderTimer();}
+});
+function ensureAudio(){try{if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();
+  if(actx.state==='suspended')actx.resume();}catch(e){}}
+function beep(soft){try{ensureAudio();if(!actx)return;
+  const base=soft?[523.25,659.25]:[587.33,587.33,784];
+  base.forEach((f,i)=>{const t=i*.42,o=actx.createOscillator(),g=actx.createGain();
+    o.type='sine';o.frequency.value=f;
+    g.gain.setValueAtTime(.0001,actx.currentTime+t);
+    g.gain.exponentialRampToValueAtTime(.22,actx.currentTime+t+.03);
+    g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+t+.36);
+    o.connect(g);g.connect(actx.destination);o.start(actx.currentTime+t);o.stop(actx.currentTime+t+.4);});
+  if(navigator.vibrate)navigator.vibrate(soft?[120]:[180,90,180]);
+}catch(e){}}
+
+/* 기록 */
+function renderLog(){
+  const box=$('log-body');
+  if(!data.sessions.length){box.innerHTML='<div class="empty"><b>아직 기록이 없습니다.</b>타이머 화면에서 첫 30분을 시작해 보세요.</div>';return;}
+  const g=data.settings.goalMin*60,by={};
+  data.sessions.forEach(s=>{(by[dayKey(s.start)]=by[dayKey(s.start)]||[]).push(s);});
+  box.innerHTML=Object.keys(by).sort().reverse().map(k=>{
+    const list=by[k].slice().sort((a,b)=>b.start-a.start);
+    const tot=list.reduce((n,s)=>n+s.sec,0);
+    return '<div class="day"><div class="day-head"><span class="day-date">'+korDate(k)+'</span>'
+      +(tot>=g?'<span class="done-tag">목표 달성</span>':'')
+      +'<span class="day-total">모두 '+human(tot)+' · '+list.length+'회</span></div>'
+      +list.map(s=>'<div class="row"><span class="time">'+hhmm(s.start)+' → '+hhmm(s.end)+'</span>'
+        +'<span class="topic">'+esc(s.topic)+'</span><span class="len">'+human(s.sec)+'</span>'
+        +'<button class="tiny" data-del="'+s.id+'">지우기</button></div>').join('')+'</div>';
+  }).join('');
+  box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('이 기록을 지울까요?'))return;
+    data.sessions=data.sessions.filter(s=>String(s.id)!==b.dataset.del);
+    markDeleted(b.dataset.del);
+    await save();renderLog();renderGoal();renderDots();});
+}
+
+/* 통계 */
+function renderStat(){
+  const g=data.settings.goalMin*60,t=totalsByDay();
+  $('s-streak').textContent=streakDays()+'일';
+  $('s-days').textContent=Object.values(t).filter(v=>v>=g).length+'일';
+  $('s-total').textContent=human(data.sessions.reduce((n,s)=>n+s.sec,0));
+  const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d);}
+  const max=Math.max(g,...days.map(d=>t[dayKey(d.getTime())]||0));
+  $('graph').innerHTML=days.map(d=>{const v=t[dayKey(d.getTime())]||0;
+    return '<div class="gcol"><div class="gbar'+(v>=g?' hit':'')+'" style="height:'+Math.max(3,Math.round(v/max*100))+'%" title="'+human(v)+'"></div>'
+      +'<div class="glabel">'+d.getDate()+'</div></div>';}).join('');
+  const tp={};data.sessions.forEach(s=>{tp[s.topic]=(tp[s.topic]||0)+s.sec;});
+  const rank=Object.entries(tp).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  $('topics').innerHTML=rank.length?rank.map(([n,v])=>
+    '<div class="topic-line"><span class="nm">'+esc(n)+'</span><span class="tb"><i style="width:'+(v/rank[0][1]*100)+'%"></i></span>'
+    +'<span class="vl">'+human(v)+'</span></div>').join('')
+    :'<div class="empty"><b>아직 볼 것이 없습니다.</b>집중을 한 번 기록하면 여기에 쌓입니다.</div>';
+}
+
+/* 설정 */
+function renderSettings(){
+  $('goal-min').value=data.settings.goalMin;
+  $('break-min').value=data.settings.breakMin;
+  $('snd').value=String(data.settings.sound);
+  $('autob').value=String(data.settings.autoBreak);
+  const rows=[['날짜','시작','종료','주제','집중(분)']].concat(
+    data.sessions.slice().sort((a,b)=>a.start-b.start)
+      .map(s=>[dayKey(s.start),hhmm(s.start),hhmm(s.end),String(s.topic).replace(/[",]/g,' '),Math.round(s.sec/60)]));
+  $('csv').value=rows.map(r=>r.join(',')).join('\n');
+  $('sync-key').placeholder=sync.key()?'저장되어 있습니다. 바꾸려면 새로 입력하세요.':'서버에 정해 둔 암호';
+  renderSync();
+}
+$('goal-min').onchange=async e=>{const v=Math.max(5,Math.min(600,Number(e.target.value)||30));
+  e.target.value=v;data.settings.goalMin=v;await save();renderGoal();toast('하루 목표를 '+v+'분으로 바꿨습니다.');};
+$('break-min').onchange=async e=>{const v=Math.max(0,Math.min(60,Number(e.target.value)||0));
+  e.target.value=v;data.settings.breakMin=v;await save();};
+$('snd').onchange=async e=>{data.settings.sound=Number(e.target.value);await save();};
+$('autob').onchange=async e=>{data.settings.autoBreak=Number(e.target.value);await save();};
+$('btn-refresh-csv').onclick=renderSettings;
+$('nav-demo').onclick=()=>hasDemo()?clearDemo():startDemo();
+$('btn-demo-on2').onclick=startDemo;
+$('btn-demo-off2').onclick=clearDemo;
+$('btn-sync-save').onclick=async()=>{
+  const v=$('sync-key').value.trim();
+  if(!v){toast('암호를 입력해 주세요.');return;}
+  sync.setKey(v);$('sync-key').value='';
+  const ok=await sync.run();refreshAll();
+  toast(ok?'동기화를 켰습니다. 이제 다른 기기에서도 같은 암호를 넣으면 됩니다.':'맞추지 못했습니다. 암호와 연결을 확인해 주세요.');
+};
+$('btn-sync-now').onclick=async()=>{
+  if(!sync.on()){toast('먼저 암호를 저장해 주세요.');return;}
+  const ok=await sync.run();refreshAll();
+  toast(ok?'기록을 맞췄습니다.':'맞추지 못했습니다.');
+};
+$('btn-sync-off').onclick=()=>{
+  if(!confirm('이 기기에서만 동기화를 끕니다. 서버의 기록과 이 기기의 기록은 그대로 남습니다. 계속할까요?'))return;
+  sync.setKey('');$('sync-key').value='';renderSync();toast('이 기기에서 동기화를 껐습니다.');
+};
+$('btn-wipe').onclick=async()=>{
+  if(!confirm('모든 기록을 지웁니다. 되돌릴 수 없습니다. 계속할까요?'))return;
+  data.sessions.forEach(s=>markDeleted(s.id));
+  data.sessions=[];data.active=null;await save();
+  renderTimer();renderLog();renderSettings();toast('기록을 모두 지웠습니다.');};
+
+let toastId=null;
+function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('on');
+  clearTimeout(toastId);toastId=setTimeout(()=>el.classList.remove('on'),2600);}
+
+applyTheme();
+(async function init(){
+  await load();
+  applyTheme();
+  if(data.active){
+    if(data.active.mode==='focus'){
+      pickMin=Math.round(data.active.target/60);
+      document.querySelectorAll('#durs .chip').forEach(c=>c.setAttribute('aria-pressed',String(Number(c.dataset.min)===pickMin)));
+      $('topic').value=data.active.topic;
+    }
+    if(data.active.running){
+      if(elapsed()>=data.active.target)await finish(true);
+      else{lockScreen();runTick();}
+    }
+  }
+  renderTimer();
+
+  /* 동기화: 켜져 있으면 시작하자마자 한 번 맞추고,
+     인터넷이 돌아오거나 화면을 다시 볼 때도 맞춥니다. */
+  renderSync();
+  if(sync.on()){
+    if(await sync.run())refreshAll();
+  }
+  window.addEventListener('online',()=>syncSoon(300));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncSoon(300);});
+})();
+</script>

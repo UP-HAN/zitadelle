@@ -1,0 +1,27 @@
+[Unit]
+Description=Zitadelle 기록 동기화 서버
+After=network.target
+
+[Service]
+Type=simple
+User=zitadelle
+Group=zitadelle
+WorkingDirectory=/opt/zitadelle-sync
+ExecStart=/usr/bin/node /opt/zitadelle-sync/server.js
+EnvironmentFile=/etc/zitadelle-sync.env
+Restart=always
+RestartSec=3
+
+# 보안 제한: 이 서비스는 자기 데이터 폴더 외에는 건드릴 수 없음
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/zitadelle
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6
+MemoryMax=200M
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+# 열쇠와 비밀 — 절대 올리지 않습니다
+*.pem
+*.key
+*.ppk
+*.env
+.env*
+secrets*
+**/authorized_keys
+
+# 배포할 때 쓴 임시 붙여넣기 파일 (더 이상 필요 없음)
+_deploy_paste/
+
+# 로컬에서만 쓰는 것
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
